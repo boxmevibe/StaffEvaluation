@@ -2,7 +2,8 @@ import { createClient } from '@supabase/supabase-js'
 import type { Database } from '../types/database'
 
 const SUPABASE_URL = 'https://jubwnkwqkqsmexcyrark.supabase.co'
-const SUPABASE_ANON_KEY = 'sb_publishable_RKaQfy08qo8o12-8uMmUfw_HM6gWov2'
+// Use JWT anon key instead of publishable key
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1Yndua3dxa3FzbWV4Y3lyYXJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4Mzc0MTYsImV4cCI6MjA4NDQxMzQxNn0.2Pz1D-o5jE4Iw-72gfu4CMk0Daaj5nMm-jWrt8zhpjo'
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY)
 
