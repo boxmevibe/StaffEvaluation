@@ -1,5 +1,6 @@
 import type { FC } from 'hono/jsx'
 import { Layout, StatCard, RankingBadge, MilestoneBadge, Table } from '../components/Layout'
+import { tooltipScript } from '../components/Tooltip'
 import { WAREHOUSES } from '../types/database'
 
 interface EmployeePageProps {
@@ -12,6 +13,22 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
 
   return (
     <Layout title="Dashboard Nhân viên" activeTab="employee">
+      {/* Help Banner */}
+      <div class="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-4 mb-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center">
+            <i class="fas fa-lightbulb text-yellow-500 text-xl mr-3"></i>
+            <div>
+              <p class="font-medium text-gray-900">Mới sử dụng? Xem hướng dẫn để hiểu các chỉ số KPI</p>
+              <p class="text-sm text-gray-600">Bấm vào icon <i class="fas fa-info-circle text-blue-500"></i> bên cạnh mỗi chỉ số để xem giải thích chi tiết</p>
+            </div>
+          </div>
+          <a href="/onboarding" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors whitespace-nowrap">
+            <i class="fas fa-book-open mr-2"></i>Hướng dẫn
+          </a>
+        </div>
+      </div>
+
       {/* Staff Selection Form */}
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
         <h2 class="text-lg font-semibold text-gray-900 mb-4">
@@ -71,7 +88,12 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
           <div id="stat-pph" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-sm font-medium text-gray-500">PPH (Points/Hour)</p>
+                <p class="text-sm font-medium text-gray-500">
+                  PPH (Points/Hour)
+                  <span class="inline-flex items-center justify-center w-5 h-5 ml-1 text-gray-400 hover:text-blue-500 cursor-help transition-colors" data-tooltip-key="pph">
+                    <i class="fas fa-info-circle text-sm"></i>
+                  </span>
+                </p>
                 <p class="text-3xl font-bold text-gray-900 mt-1" id="pph-value">--</p>
                 <p class="text-sm mt-2" id="pph-trend"></p>
               </div>
@@ -84,7 +106,12 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
           <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-sm font-medium text-gray-500">Ranking Score</p>
+                <p class="text-sm font-medium text-gray-500">
+                  Ranking Score
+                  <span class="inline-flex items-center justify-center w-5 h-5 ml-1 text-gray-400 hover:text-blue-500 cursor-help transition-colors" data-tooltip-key="ranking">
+                    <i class="fas fa-info-circle text-sm"></i>
+                  </span>
+                </p>
                 <div class="mt-2" id="ranking-badge">--</div>
               </div>
               <div class="bg-yellow-500 p-4 rounded-xl">
@@ -96,7 +123,12 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
           <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-sm font-medium text-gray-500">Điểm Main Task</p>
+                <p class="text-sm font-medium text-gray-500">
+                  Điểm Main Task
+                  <span class="inline-flex items-center justify-center w-5 h-5 ml-1 text-gray-400 hover:text-blue-500 cursor-help transition-colors" data-tooltip-key="mainTask">
+                    <i class="fas fa-info-circle text-sm"></i>
+                  </span>
+                </p>
                 <p class="text-3xl font-bold text-gray-900 mt-1" id="main-task-points">--</p>
                 <p class="text-xs text-gray-400 mt-1" id="main-task-name">--</p>
               </div>
@@ -109,7 +141,12 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
           <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-sm font-medium text-gray-500">Giờ làm việc</p>
+                <p class="text-sm font-medium text-gray-500">
+                  Giờ làm việc
+                  <span class="inline-flex items-center justify-center w-5 h-5 ml-1 text-gray-400 hover:text-blue-500 cursor-help transition-colors" data-tooltip-key="workHours">
+                    <i class="fas fa-info-circle text-sm"></i>
+                  </span>
+                </p>
                 <p class="text-3xl font-bold text-gray-900 mt-1" id="work-hours">--</p>
                 <p class="text-xs text-gray-400 mt-1" id="working-days">-- ngày</p>
               </div>
@@ -138,6 +175,9 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
             <h3 class="text-lg font-semibold text-gray-900 mb-4">
               <i class="fas fa-shield-alt text-red-600 mr-2"></i>
               Điểm rủi ro ORS (Tháng)
+              <span class="inline-flex items-center justify-center w-5 h-5 ml-1 text-gray-400 hover:text-blue-500 cursor-help transition-colors" data-tooltip-key="ors">
+                <i class="fas fa-info-circle text-sm"></i>
+              </span>
             </h3>
             <div id="ors-summary" class="space-y-4">
               <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
@@ -164,23 +204,48 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
           </h3>
           <div id="monthly-summary" class="grid md:grid-cols-5 gap-4">
             <div class="text-center p-4 bg-blue-50 rounded-lg">
-              <p class="text-sm text-gray-500">Major KPI</p>
+              <p class="text-sm text-gray-500">
+                Major KPI
+                <span class="inline-flex items-center justify-center w-4 h-4 ml-1 text-gray-400 hover:text-blue-500 cursor-help transition-colors" data-tooltip-key="mainTask">
+                  <i class="fas fa-info-circle text-xs"></i>
+                </span>
+              </p>
               <p class="text-2xl font-bold text-blue-600" id="monthly-major-kpi">--</p>
             </div>
             <div class="text-center p-4 bg-yellow-50 rounded-lg">
-              <p class="text-sm text-gray-500">Avg Ranking</p>
+              <p class="text-sm text-gray-500">
+                Avg Ranking
+                <span class="inline-flex items-center justify-center w-4 h-4 ml-1 text-gray-400 hover:text-blue-500 cursor-help transition-colors" data-tooltip-key="ranking">
+                  <i class="fas fa-info-circle text-xs"></i>
+                </span>
+              </p>
               <p class="text-2xl font-bold text-yellow-600" id="monthly-avg-ranking">--</p>
             </div>
             <div class="text-center p-4 bg-purple-50 rounded-lg">
-              <p class="text-sm text-gray-500">Rating Factor</p>
+              <p class="text-sm text-gray-500">
+                Rating Factor
+                <span class="inline-flex items-center justify-center w-4 h-4 ml-1 text-gray-400 hover:text-blue-500 cursor-help transition-colors" data-tooltip-key="ratingFactor">
+                  <i class="fas fa-info-circle text-xs"></i>
+                </span>
+              </p>
               <p class="text-2xl font-bold text-purple-600" id="monthly-rating-factor">--</p>
             </div>
             <div class="text-center p-4 bg-red-50 rounded-lg">
-              <p class="text-sm text-gray-500">ORS Penalty</p>
+              <p class="text-sm text-gray-500">
+                ORS Penalty
+                <span class="inline-flex items-center justify-center w-4 h-4 ml-1 text-gray-400 hover:text-blue-500 cursor-help transition-colors" data-tooltip-key="ors">
+                  <i class="fas fa-info-circle text-xs"></i>
+                </span>
+              </p>
               <p class="text-2xl font-bold text-red-600" id="monthly-ors-penalty">--</p>
             </div>
             <div class="text-center p-4 bg-green-50 rounded-lg">
-              <p class="text-sm text-gray-500">KPI Bonus</p>
+              <p class="text-sm text-gray-500">
+                KPI Bonus
+                <span class="inline-flex items-center justify-center w-4 h-4 ml-1 text-gray-400 hover:text-blue-500 cursor-help transition-colors" data-tooltip-key="kpiBonus">
+                  <i class="fas fa-info-circle text-xs"></i>
+                </span>
+              </p>
               <p class="text-2xl font-bold text-green-600" id="monthly-kpi-bonus">--</p>
             </div>
           </div>
@@ -416,6 +481,9 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
         const onejan = new Date(year, 0, 1);
         const week = Math.ceil((((now - onejan) / 86400000) + onejan.getDay() + 1) / 7);
         document.getElementById('yearWeek').value = year + '-W' + String(week).padStart(2, '0');
+        
+        // Tooltip Script
+        ${tooltipScript}
       `}} />
     </Layout>
   )

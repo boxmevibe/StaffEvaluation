@@ -574,6 +574,392 @@ api.get('/admin/bonus-config', async (c) => {
   return c.json({ success: true, data })
 })
 
+// ==================== ADMIN CRUD APIs ====================
+
+// Create/Update ranking config
+api.post('/admin/ranking-config/upsert', async (c) => {
+  const body = await c.req.json()
+  const supabase = createSupabaseClient()
+
+  const { id, warehouse_code, role, main_task, pph_min, pph_max, ranking_score, min_weekly_hours, description, is_active } = body
+
+  const record = {
+    warehouse_code: warehouse_code || null,
+    role: role || null,
+    main_task: main_task || null,
+    pph_min: parseFloat(pph_min) || 0,
+    pph_max: parseFloat(pph_max) || 999999.99,
+    ranking_score: parseInt(ranking_score),
+    min_weekly_hours: parseFloat(min_weekly_hours) || 20,
+    description,
+    is_active: is_active !== false,
+    effective_from: new Date().toISOString().split('T')[0],
+  }
+
+  let query
+  if (id) {
+    query = supabase.from('ranking_range_config').update(record).eq('id', id)
+  } else {
+    query = supabase.from('ranking_range_config').insert(record)
+  }
+
+  const { data, error } = await query.select().single()
+
+  if (error) {
+    return c.json({ success: false, error: error.message }, 500)
+  }
+
+  return c.json({ success: true, data })
+})
+
+// Toggle ranking config active status
+api.post('/admin/ranking-config/:id/toggle', async (c) => {
+  const id = c.req.param('id')
+  const supabase = createSupabaseClient()
+
+  // Get current status
+  const { data: current } = await supabase
+    .from('ranking_range_config')
+    .select('is_active')
+    .eq('id', id)
+    .single()
+
+  const { data, error } = await supabase
+    .from('ranking_range_config')
+    .update({ is_active: !current?.is_active })
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) {
+    return c.json({ success: false, error: error.message }, 500)
+  }
+
+  return c.json({ success: true, data })
+})
+
+// Delete ranking config
+api.delete('/admin/ranking-config/:id', async (c) => {
+  const id = c.req.param('id')
+  const supabase = createSupabaseClient()
+
+  const { error } = await supabase
+    .from('ranking_range_config')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    return c.json({ success: false, error: error.message }, 500)
+  }
+
+  return c.json({ success: true, message: 'Deleted successfully' })
+})
+
+// Create/Update role-task config
+api.post('/admin/role-task-config/upsert', async (c) => {
+  const body = await c.req.json()
+  const supabase = createSupabaseClient()
+
+  const { id, warehouse_code, role, role_id, main_task, is_active } = body
+
+  if (!role || !main_task) {
+    return c.json({ success: false, error: 'role and main_task are required' }, 400)
+  }
+
+  const record = {
+    warehouse_code: warehouse_code || null,
+    role,
+    role_id: role_id || null,
+    main_task,
+    is_active: is_active !== false,
+    effective_from: new Date().toISOString().split('T')[0],
+  }
+
+  let query
+  if (id) {
+    query = supabase.from('role_main_task_config').update(record).eq('id', id)
+  } else {
+    query = supabase.from('role_main_task_config').insert(record)
+  }
+
+  const { data, error } = await query.select().single()
+
+  if (error) {
+    return c.json({ success: false, error: error.message }, 500)
+  }
+
+  return c.json({ success: true, data })
+})
+
+// Toggle role-task config active status
+api.post('/admin/role-task-config/:id/toggle', async (c) => {
+  const id = c.req.param('id')
+  const supabase = createSupabaseClient()
+
+  const { data: current } = await supabase
+    .from('role_main_task_config')
+    .select('is_active')
+    .eq('id', id)
+    .single()
+
+  const { data, error } = await supabase
+    .from('role_main_task_config')
+    .update({ is_active: !current?.is_active })
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) {
+    return c.json({ success: false, error: error.message }, 500)
+  }
+
+  return c.json({ success: true, data })
+})
+
+// Delete role-task config
+api.delete('/admin/role-task-config/:id', async (c) => {
+  const id = c.req.param('id')
+  const supabase = createSupabaseClient()
+
+  const { error } = await supabase
+    .from('role_main_task_config')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    return c.json({ success: false, error: error.message }, 500)
+  }
+
+  return c.json({ success: true, message: 'Deleted successfully' })
+})
+
+// Create/Update ORS catalog
+api.post('/admin/ors-catalog/upsert', async (c) => {
+  const body = await c.req.json()
+  const supabase = createSupabaseClient()
+
+  const { id, ors_code, job_group, name, description, severity_level, ors_points, is_active } = body
+
+  if (!ors_code || !job_group || !name || !severity_level || ors_points === undefined) {
+    return c.json({ success: false, error: 'Missing required fields' }, 400)
+  }
+
+  const record = {
+    ors_code,
+    job_group,
+    name,
+    description: description || null,
+    severity_level,
+    ors_points: parseInt(ors_points),
+    is_active: is_active !== false,
+  }
+
+  let query
+  if (id) {
+    query = supabase.from('ors_catalog').update(record).eq('id', id)
+  } else {
+    query = supabase.from('ors_catalog').insert(record)
+  }
+
+  const { data, error } = await query.select().single()
+
+  if (error) {
+    return c.json({ success: false, error: error.message }, 500)
+  }
+
+  return c.json({ success: true, data })
+})
+
+// Toggle ORS catalog active status
+api.post('/admin/ors-catalog/:id/toggle', async (c) => {
+  const id = c.req.param('id')
+  const supabase = createSupabaseClient()
+
+  const { data: current } = await supabase
+    .from('ors_catalog')
+    .select('is_active')
+    .eq('id', id)
+    .single()
+
+  const { data, error } = await supabase
+    .from('ors_catalog')
+    .update({ is_active: !current?.is_active })
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) {
+    return c.json({ success: false, error: error.message }, 500)
+  }
+
+  return c.json({ success: true, data })
+})
+
+// Delete ORS catalog item
+api.delete('/admin/ors-catalog/:id', async (c) => {
+  const id = c.req.param('id')
+  const supabase = createSupabaseClient()
+
+  const { error } = await supabase
+    .from('ors_catalog')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    return c.json({ success: false, error: error.message }, 500)
+  }
+
+  return c.json({ success: true, message: 'Deleted successfully' })
+})
+
+// Create/Update bonus config
+api.post('/admin/bonus-config/upsert', async (c) => {
+  const body = await c.req.json()
+  const supabase = createSupabaseClient()
+
+  const { id, warehouse_code, country, ranking_score_min, ranking_score_max, calculation_type, amount_per_point, fixed_amount, cap_amount, currency, is_active } = body
+
+  if (!country || !calculation_type || !currency) {
+    return c.json({ success: false, error: 'country, calculation_type, and currency are required' }, 400)
+  }
+
+  const record = {
+    warehouse_code: warehouse_code || null,
+    country,
+    ranking_score_min: parseInt(ranking_score_min) || 1,
+    ranking_score_max: parseInt(ranking_score_max) || 5,
+    calculation_type,
+    amount_per_point: parseFloat(amount_per_point) || null,
+    fixed_amount: parseFloat(fixed_amount) || null,
+    cap_amount: parseFloat(cap_amount) || null,
+    currency,
+    is_active: is_active !== false,
+    effective_from: new Date().toISOString().split('T')[0],
+  }
+
+  let query
+  if (id) {
+    query = supabase.from('kpi_bonus_config').update(record).eq('id', id)
+  } else {
+    query = supabase.from('kpi_bonus_config').insert(record)
+  }
+
+  const { data, error } = await query.select().single()
+
+  if (error) {
+    return c.json({ success: false, error: error.message }, 500)
+  }
+
+  return c.json({ success: true, data })
+})
+
+// Toggle bonus config active status
+api.post('/admin/bonus-config/:id/toggle', async (c) => {
+  const id = c.req.param('id')
+  const supabase = createSupabaseClient()
+
+  const { data: current } = await supabase
+    .from('kpi_bonus_config')
+    .select('is_active')
+    .eq('id', id)
+    .single()
+
+  const { data, error } = await supabase
+    .from('kpi_bonus_config')
+    .update({ is_active: !current?.is_active })
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) {
+    return c.json({ success: false, error: error.message }, 500)
+  }
+
+  return c.json({ success: true, data })
+})
+
+// Delete bonus config
+api.delete('/admin/bonus-config/:id', async (c) => {
+  const id = c.req.param('id')
+  const supabase = createSupabaseClient()
+
+  const { error } = await supabase
+    .from('kpi_bonus_config')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    return c.json({ success: false, error: error.message }, 500)
+  }
+
+  return c.json({ success: true, message: 'Deleted successfully' })
+})
+
+// Get all ranking configs (including inactive)
+api.get('/admin/ranking-config/all', async (c) => {
+  const supabase = createSupabaseClient()
+
+  const { data, error } = await supabase
+    .from('ranking_range_config')
+    .select('*')
+    .order('ranking_score', { ascending: false })
+
+  if (error) {
+    return c.json({ success: false, error: error.message }, 500)
+  }
+
+  return c.json({ success: true, data })
+})
+
+// Get all role-task configs (including inactive)
+api.get('/admin/role-task-config/all', async (c) => {
+  const supabase = createSupabaseClient()
+
+  const { data, error } = await supabase
+    .from('role_main_task_config')
+    .select('*')
+    .order('role')
+
+  if (error) {
+    return c.json({ success: false, error: error.message }, 500)
+  }
+
+  return c.json({ success: true, data })
+})
+
+// Get all ORS catalog (including inactive)
+api.get('/admin/ors-catalog/all', async (c) => {
+  const supabase = createSupabaseClient()
+
+  const { data, error } = await supabase
+    .from('ors_catalog')
+    .select('*')
+    .order('job_group')
+    .order('ors_code')
+
+  if (error) {
+    return c.json({ success: false, error: error.message }, 500)
+  }
+
+  return c.json({ success: true, data })
+})
+
+// Get all bonus configs (including inactive)
+api.get('/admin/bonus-config/all', async (c) => {
+  const supabase = createSupabaseClient()
+
+  const { data, error } = await supabase
+    .from('kpi_bonus_config')
+    .select('*')
+    .order('country')
+
+  if (error) {
+    return c.json({ success: false, error: error.message }, 500)
+  }
+
+  return c.json({ success: true, data })
+})
+
 // ==================== JOBS APIs ====================
 
 // Run Job A manually

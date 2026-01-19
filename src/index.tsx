@@ -8,6 +8,7 @@ import { EmployeePage } from './pages/employee'
 import { ManagerPage } from './pages/manager'
 import { AdminPage } from './pages/admin'
 import { PayrollPage } from './pages/payroll'
+import { OnboardingPage } from './pages/onboarding'
 
 const app = new Hono()
 
@@ -47,6 +48,10 @@ app.get('/admin', (c) => {
 
 app.get('/payroll', (c) => {
   return c.render(<PayrollPage />, { title: 'Payroll KPI Data - KPI Warehouse' })
+})
+
+app.get('/onboarding', (c) => {
+  return c.render(<OnboardingPage />, { title: 'Hướng dẫn sử dụng - KPI Warehouse' })
 })
 
 // Static files
