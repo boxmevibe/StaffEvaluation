@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { renderer } from './renderer'
 import api from './routes/api'
 import demo from './routes/demo'
+import seed from './routes/seed'
 import { HomePage } from './pages/home'
 import { EmployeePage } from './pages/employee'
 import { ManagerPage } from './pages/manager'
@@ -18,6 +19,9 @@ app.route('/api', api)
 
 // Mount Demo API routes (No database required)
 app.route('/demo', demo)
+
+// Mount Seed API routes (Generate sample data)
+app.route('/seed', seed)
 
 // Page routes
 app.get('/', (c) => {

@@ -26,6 +26,9 @@ export const AdminPage: FC = () => {
             <button onclick="showTab('jobs')" id="tab-jobs" class="px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
               <i class="fas fa-cogs mr-2"></i>Run Jobs
             </button>
+            <button onclick="showTab('seed')" id="tab-seed" class="px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+              <i class="fas fa-database mr-2"></i>Sample Data
+            </button>
           </nav>
         </div>
       </div>
@@ -147,6 +150,117 @@ export const AdminPage: FC = () => {
                 <tr><td colspan="7" class="px-4 py-8 text-center text-gray-500">Loading...</td></tr>
               </tbody>
             </table>
+          </div>
+        </div>
+      </div>
+
+      {/* Sample Data Tab */}
+      <div id="content-seed" class="tab-content hidden">
+        <div class="grid md:grid-cols-2 gap-6">
+          {/* Current Stats */}
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+              <i class="fas fa-chart-bar text-blue-600 mr-2"></i>
+              Trạng thái dữ liệu hiện tại
+            </h3>
+            <div id="seed-stats" class="space-y-3">
+              <div class="text-center text-gray-500 py-4">
+                <i class="fas fa-spinner fa-spin mr-2"></i>Loading...
+              </div>
+            </div>
+            <button onclick="loadSeedStats()" class="mt-4 w-full bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200">
+              <i class="fas fa-sync mr-2"></i>Refresh Stats
+            </button>
+          </div>
+
+          {/* Generate Data */}
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+              <i class="fas fa-magic text-purple-600 mr-2"></i>
+              Generate Sample Data
+            </h3>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Payroll Period</label>
+                <input type="month" id="seed-period" class="w-full border border-gray-300 rounded-lg px-3 py-2" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Number of Weeks</label>
+                <select id="seed-weeks" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                  <option value="1">1 tuần</option>
+                  <option value="2">2 tuần</option>
+                  <option value="3">3 tuần</option>
+                  <option value="4" selected>4 tuần (cả tháng)</option>
+                </select>
+              </div>
+              <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p class="text-sm text-blue-800">
+                  <i class="fas fa-info-circle mr-2"></i>
+                  <strong>Sẽ tạo:</strong> ~33 nhân viên × 3 kho × số tuần = 
+                  <span id="estimate-records" class="font-bold">132</span> bản ghi/bảng
+                </p>
+              </div>
+              <button onclick="generateSeedData()" id="btn-generate" class="w-full bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-3 rounded-lg font-medium hover:from-purple-600 hover:to-blue-600">
+                <i class="fas fa-database mr-2"></i>
+                Generate Sample Data
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Data Preview */}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">
+            <i class="fas fa-eye text-green-600 mr-2"></i>
+            Preview dữ liệu mẫu
+          </h3>
+          <div class="mb-4">
+            <select id="preview-table" onchange="loadPreviewData()" class="border border-gray-300 rounded-lg px-3 py-2">
+              <option value="kpi_weekly_summary">KPI Weekly Summary</option>
+              <option value="ranking_weekly_result">Ranking Weekly Result</option>
+              <option value="ors_event">ORS Events</option>
+              <option value="ors_monthly_summary">ORS Monthly Summary</option>
+              <option value="kpi_monthly_summary">KPI Monthly Summary</option>
+              <option value="payroll_kpi_bridge">Payroll KPI Bridge</option>
+            </select>
+            <span id="preview-count" class="ml-4 text-sm text-gray-500"></span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50">
+                <tr id="preview-header">
+                  <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Loading...</th>
+                </tr>
+              </thead>
+              <tbody id="preview-body" class="divide-y divide-gray-200">
+                <tr><td class="px-3 py-4 text-center text-gray-500">Select a table to preview data</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Danger Zone */}
+        <div class="bg-red-50 border border-red-200 rounded-xl p-6 mt-6">
+          <h3 class="text-lg font-semibold text-red-800 mb-4">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            Danger Zone
+          </h3>
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-red-700 font-medium">Reset all sample data</p>
+              <p class="text-sm text-red-600">Xóa toàn bộ dữ liệu trong các bảng kết quả (không ảnh hưởng cấu hình)</p>
+            </div>
+            <button onclick="resetSeedData()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+              <i class="fas fa-trash mr-2"></i>Reset Data
+            </button>
+          </div>
+        </div>
+
+        {/* Generation Result */}
+        <div id="seed-result" class="mt-6 hidden">
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h4 class="font-medium text-gray-900 mb-2">Kết quả:</h4>
+            <pre id="seed-output" class="bg-gray-100 p-4 rounded-lg text-sm overflow-x-auto max-h-64"></pre>
           </div>
         </div>
       </div>
@@ -278,6 +392,7 @@ export const AdminPage: FC = () => {
           if (tab === 'role') loadRoleConfig();
           if (tab === 'ors') loadOrsCatalog();
           if (tab === 'bonus') loadBonusConfig();
+          if (tab === 'seed') { loadSeedStats(); loadPreviewData(); }
         }
 
         async function loadRankingConfig() {
@@ -456,6 +571,150 @@ export const AdminPage: FC = () => {
 
         // Load initial data
         loadRankingConfig();
+
+        // ========== SEED DATA FUNCTIONS ==========
+        // Set default seed period
+        document.getElementById('seed-period').value = new Date().toISOString().slice(0, 7);
+
+        // Update estimate when weeks change
+        document.getElementById('seed-weeks').addEventListener('change', function() {
+          const weeks = parseInt(this.value);
+          document.getElementById('estimate-records').textContent = (33 * weeks).toString();
+        });
+
+        async function loadSeedStats() {
+          try {
+            const res = await axios.get('/seed/stats');
+            const stats = res.data.stats;
+
+            const tables = [
+              { key: 'kpi_weekly_summary', label: 'KPI Weekly Summary', icon: 'fa-calculator', color: 'blue' },
+              { key: 'ranking_weekly_result', label: 'Ranking Weekly Result', icon: 'fa-star', color: 'purple' },
+              { key: 'ors_event', label: 'ORS Events', icon: 'fa-exclamation-circle', color: 'red' },
+              { key: 'ors_monthly_summary', label: 'ORS Monthly Summary', icon: 'fa-shield-alt', color: 'orange' },
+              { key: 'kpi_monthly_summary', label: 'KPI Monthly Summary', icon: 'fa-chart-line', color: 'green' },
+              { key: 'payroll_kpi_bridge', label: 'Payroll KPI Bridge', icon: 'fa-money-bill', color: 'teal' }
+            ];
+
+            document.getElementById('seed-stats').innerHTML = tables.map(t => {
+              const count = stats[t.key]?.count || 0;
+              const hasData = count > 0;
+              return \`
+                <div class="flex items-center justify-between p-3 bg-\${t.color}-50 rounded-lg">
+                  <div class="flex items-center">
+                    <i class="fas \${t.icon} text-\${t.color}-600 mr-3"></i>
+                    <span class="text-sm font-medium text-gray-700">\${t.label}</span>
+                  </div>
+                  <span class="px-3 py-1 rounded-full text-sm font-bold \${hasData ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-500'}">
+                    \${count.toLocaleString()}
+                  </span>
+                </div>
+              \`;
+            }).join('');
+          } catch (error) {
+            document.getElementById('seed-stats').innerHTML = '<div class="text-red-500">Error loading stats</div>';
+          }
+        }
+
+        async function generateSeedData() {
+          const period = document.getElementById('seed-period').value;
+          const weeks = document.getElementById('seed-weeks').value;
+
+          if (!period) {
+            alert('Vui lòng chọn Payroll Period');
+            return;
+          }
+
+          const btn = document.getElementById('btn-generate');
+          btn.disabled = true;
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Đang tạo dữ liệu...';
+
+          try {
+            document.getElementById('seed-result').classList.remove('hidden');
+            document.getElementById('seed-output').textContent = 'Generating sample data...\\nPeriod: ' + period + '\\nWeeks: ' + weeks;
+
+            const res = await axios.post('/seed/generate', {
+              payrollPeriod: period,
+              weeks: parseInt(weeks)
+            });
+
+            document.getElementById('seed-output').textContent = JSON.stringify(res.data, null, 2);
+            loadSeedStats();
+            loadPreviewData();
+
+            alert('✅ Tạo dữ liệu thành công!');
+          } catch (error) {
+            document.getElementById('seed-output').textContent = 'Error: ' + (error.response?.data?.error || error.message);
+            alert('❌ Lỗi: ' + (error.response?.data?.error || error.message));
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-database mr-2"></i>Generate Sample Data';
+          }
+        }
+
+        async function loadPreviewData() {
+          const table = document.getElementById('preview-table').value;
+
+          try {
+            const res = await axios.get('/seed/preview?table=' + table);
+            const data = res.data.data || [];
+            const total = res.data.total || 0;
+
+            document.getElementById('preview-count').textContent = total + ' bản ghi (hiển thị ' + data.length + ')';
+
+            if (data.length === 0) {
+              document.getElementById('preview-header').innerHTML = '<th class="px-3 py-2 text-left text-xs font-medium text-gray-500">No data</th>';
+              document.getElementById('preview-body').innerHTML = '<tr><td class="px-3 py-4 text-center text-gray-500">Không có dữ liệu. Hãy Generate Sample Data trước.</td></tr>';
+              return;
+            }
+
+            // Get columns from first record
+            const columns = Object.keys(data[0]).filter(k => !k.startsWith('_') && k !== 'created_at' && k !== 'updated_at');
+
+            document.getElementById('preview-header').innerHTML = columns.map(c => 
+              '<th class="px-3 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap">' + c.replace(/_/g, ' ') + '</th>'
+            ).join('');
+
+            document.getElementById('preview-body').innerHTML = data.map(row => 
+              '<tr class="hover:bg-gray-50">' + columns.map(c => {
+                let val = row[c];
+                if (val === null) val = '-';
+                else if (typeof val === 'number') val = val.toLocaleString();
+                else if (typeof val === 'boolean') val = val ? '✅' : '❌';
+                return '<td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">' + val + '</td>';
+              }).join('') + '</tr>'
+            ).join('');
+          } catch (error) {
+            document.getElementById('preview-body').innerHTML = '<tr><td class="px-3 py-4 text-center text-red-500">Error: ' + error.message + '</td></tr>';
+          }
+        }
+
+        async function resetSeedData() {
+          if (!confirm('⚠️ Bạn có chắc muốn xóa toàn bộ dữ liệu sample?\\n\\nĐây là hành động không thể hoàn tác!')) {
+            return;
+          }
+
+          try {
+            document.getElementById('seed-result').classList.remove('hidden');
+            document.getElementById('seed-output').textContent = 'Resetting data...';
+
+            const res = await axios.post('/seed/reset');
+            document.getElementById('seed-output').textContent = JSON.stringify(res.data, null, 2);
+            loadSeedStats();
+            loadPreviewData();
+
+            alert('✅ Đã reset dữ liệu thành công!');
+          } catch (error) {
+            document.getElementById('seed-output').textContent = 'Error: ' + (error.response?.data?.error || error.message);
+            alert('❌ Lỗi: ' + (error.response?.data?.error || error.message));
+          }
+        }
+
+        // Auto-load stats and preview when seed tab is shown
+        if (window.location.hash === '#seed' || document.getElementById('tab-seed').classList.contains('border-blue-500')) {
+          loadSeedStats();
+          loadPreviewData();
+        }
       `}} />
     </Layout>
   )

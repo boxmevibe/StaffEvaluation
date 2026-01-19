@@ -294,23 +294,35 @@ api.get('/manager/ranking', async (c) => {
   
   const supabase = createSupabaseClient()
 
-  let query = supabase
+  // Get ranking data
+  const { data: rankings, error: rankingError } = await supabase
     .from('ranking_weekly_result')
-    .select(`
-      *,
-      kpi_weekly_summary!inner(main_task, total_points, task_points_detail)
-    `)
+    .select('*')
     .eq('warehouse_code', warehouseCode)
     .eq('year_week', yearWeek)
     .order('ranking_score', { ascending: false })
     .order('pph', { ascending: false })
     .range(offset, offset + limit - 1)
 
-  const { data, error, count } = await query
-
-  if (error) {
-    return c.json({ success: false, error: error.message }, 500)
+  if (rankingError) {
+    return c.json({ success: false, error: rankingError.message }, 500)
   }
+
+  // Get weekly summaries for additional info
+  const staffIds = rankings?.map(r => r.staff_id) || []
+  const { data: weeklySummaries } = await supabase
+    .from('kpi_weekly_summary')
+    .select('staff_id, main_task, total_points, task_points_detail')
+    .eq('warehouse_code', warehouseCode)
+    .eq('year_week', yearWeek)
+    .in('staff_id', staffIds)
+
+  // Merge data
+  const summaryMap = new Map(weeklySummaries?.map(s => [s.staff_id, s]) || [])
+  const data = rankings?.map(r => ({
+    ...r,
+    kpi_weekly_summary: summaryMap.get(r.staff_id) || null
+  }))
 
   return c.json({
     success: true,
@@ -318,7 +330,7 @@ api.get('/manager/ranking', async (c) => {
     pagination: {
       limit,
       offset,
-      total: count,
+      total: data?.length || 0,
     },
   })
 })
