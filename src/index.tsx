@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { renderer } from './renderer'
 import api from './routes/api'
+import demo from './routes/demo'
 import { HomePage } from './pages/home'
 import { EmployeePage } from './pages/employee'
 import { ManagerPage } from './pages/manager'
@@ -12,8 +13,11 @@ const app = new Hono()
 // Use renderer middleware
 app.use(renderer)
 
-// Mount API routes
+// Mount API routes (Production with Supabase)
 app.route('/api', api)
+
+// Mount Demo API routes (No database required)
+app.route('/demo', demo)
 
 // Page routes
 app.get('/', (c) => {

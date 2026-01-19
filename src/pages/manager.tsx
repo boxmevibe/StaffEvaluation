@@ -216,10 +216,19 @@ export const ManagerPage: FC = () => {
 
       {/* Full Ranking Table */}
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">
-          <i class="fas fa-list-ol text-purple-600 mr-2"></i>
-          Bảng xếp hạng đầy đủ
-        </h3>
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold text-gray-900">
+            <i class="fas fa-list-ol text-purple-600 mr-2"></i>
+            Bảng xếp hạng đầy đủ
+          </h3>
+          <button 
+            onclick="exportRankingCSV()"
+            class="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 text-sm"
+          >
+            <i class="fas fa-file-csv mr-2"></i>
+            Export CSV
+          </button>
+        </div>
         <div class="overflow-x-auto">
           <table class="w-full">
             <thead class="bg-gray-50">
@@ -242,9 +251,10 @@ export const ManagerPage: FC = () => {
       </div>
 
       <script dangerouslySetInnerHTML={{ __html: `
-        const API_BASE = '/api';
+        // Using window.API_BASE from Layout;
         let distributionChart = null;
         let orsCatalog = [];
+        let rankingData = []; // Store ranking data for export
 
         // Set default dates
         const now = new Date();
@@ -258,7 +268,7 @@ export const ManagerPage: FC = () => {
         // Load ORS catalog
         async function loadOrsCatalog() {
           try {
-            const res = await axios.get(API_BASE + '/admin/ors-catalog');
+            const res = await axios.get(window.API_BASE + '/admin/ors-catalog');
             orsCatalog = res.data.data || [];
             const select = document.getElementById('ors-code');
             let currentGroup = '';
@@ -293,7 +303,7 @@ export const ManagerPage: FC = () => {
 
           try {
             // Load dashboard stats
-            const dashRes = await axios.get(API_BASE + '/manager/dashboard?warehouseCode=' + warehouseCode + '&yearWeek=' + yearWeek);
+            const dashRes = await axios.get(window.API_BASE + '/manager/dashboard?warehouseCode=' + warehouseCode + '&yearWeek=' + yearWeek);
             const dash = dashRes.data.data;
             
             document.getElementById('stat-total-staff').textContent = dash.totalStaff;
@@ -312,8 +322,9 @@ export const ManagerPage: FC = () => {
             updateDistributionChart([dist[5]||0, dist[4]||0, dist[3]||0, dist[2]||0, dist[1]||0]);
 
             // Load ranking
-            const rankRes = await axios.get(API_BASE + '/manager/ranking?warehouseCode=' + warehouseCode + '&yearWeek=' + yearWeek + '&limit=100');
+            const rankRes = await axios.get(window.API_BASE + '/manager/ranking?warehouseCode=' + warehouseCode + '&yearWeek=' + yearWeek + '&limit=100');
             const rankings = rankRes.data.data || [];
+            rankingData = rankings; // Store for export
 
             // Top 10
             document.getElementById('top-performers-body').innerHTML = rankings.slice(0, 10).map((r, i) => {
@@ -355,7 +366,7 @@ export const ManagerPage: FC = () => {
             }).join('') || '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500">Không có dữ liệu</td></tr>';
 
             // Load ORS alerts
-            const alertRes = await axios.get(API_BASE + '/manager/ors/alerts?warehouseCode=' + warehouseCode + '&payrollPeriod=' + payrollPeriod);
+            const alertRes = await axios.get(window.API_BASE + '/manager/ors/alerts?warehouseCode=' + warehouseCode + '&payrollPeriod=' + payrollPeriod);
             const alerts = alertRes.data.data || [];
             document.getElementById('stat-ors-alerts').textContent = alerts.length;
             
@@ -383,7 +394,7 @@ export const ManagerPage: FC = () => {
             \`).join('') || '<p class="text-gray-500 text-center py-4">Không có cảnh báo</p>';
 
             // Load pending ORS
-            const pendingRes = await axios.get(API_BASE + '/manager/ors/pending?warehouseCode=' + warehouseCode);
+            const pendingRes = await axios.get(window.API_BASE + '/manager/ors/pending?warehouseCode=' + warehouseCode);
             const pending = pendingRes.data.data || [];
             document.getElementById('pending-count').textContent = pending.length;
             
@@ -454,7 +465,7 @@ export const ManagerPage: FC = () => {
           }
 
           try {
-            await axios.post(API_BASE + '/manager/ors/' + eventId + '/review', {
+            await axios.post(window.API_BASE + '/manager/ors/' + eventId + '/review', {
               status,
               reviewed_by: reviewedBy,
               rejection_reason: rejectionReason
@@ -486,7 +497,7 @@ export const ManagerPage: FC = () => {
           };
 
           try {
-            await axios.post(API_BASE + '/manager/ors/create', data);
+            await axios.post(window.API_BASE + '/manager/ors/create', data);
             alert('Đã tạo ORS event thành công');
             document.getElementById('create-ors-form').reset();
             document.getElementById('ors-event-date').value = new Date().toISOString().slice(0, 10);
@@ -495,6 +506,50 @@ export const ManagerPage: FC = () => {
             alert('Lỗi: ' + (error.response?.data?.error || error.message));
           }
         });
+
+        // Export ranking data to CSV
+        function exportRankingCSV() {
+          if (!rankingData || rankingData.length === 0) {
+            alert('Không có dữ liệu để export. Vui lòng tải dữ liệu trước.');
+            return;
+          }
+
+          const warehouseCode = document.getElementById('warehouseCode').value;
+          const yearWeek = document.getElementById('yearWeek').value;
+          
+          const columns = [
+            { key: 'staff_id', label: 'Mã NV' },
+            { key: 'staff_name', label: 'Tên NV' },
+            { key: 'pph', label: 'PPH' },
+            { key: 'main_task_points', label: 'Điểm Main Task' },
+            { key: 'estimated_work_hours', label: 'Giờ làm việc' },
+            { key: 'ranking_score', label: 'Ranking Score' },
+            { key: 'status', label: 'Trạng thái' },
+          ];
+          
+          // Build CSV
+          const header = columns.map(c => '"' + c.label + '"').join(',');
+          const rows = rankingData.map(item => {
+            return columns.map(c => {
+              let val = item[c.key];
+              if (val === null || val === undefined) return '""';
+              return '"' + String(val).replace(/"/g, '""') + '"';
+            }).join(',');
+          });
+          
+          const csv = [header, ...rows].join('\\n');
+          const BOM = '\\uFEFF';
+          const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', 'ranking_' + warehouseCode + '_' + yearWeek + '.csv');
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        }
       `}} />
     </Layout>
   )

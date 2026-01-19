@@ -77,8 +77,28 @@ export const Layout: FC<LayoutProps> = ({
               </a>
             </nav>
 
-            {/* User Info */}
+            {/* Mode Toggle & User Info */}
             <div class="flex items-center space-x-4">
+              {/* Demo/Production Mode Toggle */}
+              <div class="flex items-center bg-gray-100 rounded-lg p-1">
+                <button 
+                  id="mode-demo" 
+                  class="px-3 py-1 text-xs font-medium rounded-md transition-colors mode-toggle-btn"
+                  data-mode="demo"
+                >
+                  <i class="fas fa-flask mr-1"></i>
+                  Demo
+                </button>
+                <button 
+                  id="mode-prod" 
+                  class="px-3 py-1 text-xs font-medium rounded-md transition-colors mode-toggle-btn"
+                  data-mode="api"
+                >
+                  <i class="fas fa-database mr-1"></i>
+                  Production
+                </button>
+              </div>
+              
               {warehouseCode && (
                 <span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">
                   <i class="fas fa-building mr-1"></i>
@@ -113,11 +133,69 @@ export const Layout: FC<LayoutProps> = ({
       {/* Footer */}
       <footer class="bg-white border-t border-gray-200 mt-auto">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <p class="text-center text-sm text-gray-500">
-            © 2025 Boxme KPI Warehouse Management System v2.0
-          </p>
+          <div class="flex justify-between items-center">
+            <p class="text-sm text-gray-500">
+              © 2025 Boxme KPI Warehouse Management System v2.0
+            </p>
+            <div id="api-mode-indicator" class="text-xs px-2 py-1 rounded bg-amber-100 text-amber-800">
+              <i class="fas fa-flask mr-1"></i>
+              Demo Mode
+            </div>
+          </div>
         </div>
       </footer>
+
+      {/* Mode Toggle Script */}
+      <script dangerouslySetInnerHTML={{ __html: `
+        // API Mode Management
+        window.API_MODE = localStorage.getItem('kpi_api_mode') || 'demo';
+        window.API_BASE = window.API_MODE === 'demo' ? '/demo' : '/api';
+        
+        function updateModeUI() {
+          const demoBtn = document.getElementById('mode-demo');
+          const prodBtn = document.getElementById('mode-prod');
+          const indicator = document.getElementById('api-mode-indicator');
+          
+          if (window.API_MODE === 'demo') {
+            demoBtn.classList.add('bg-amber-500', 'text-white');
+            demoBtn.classList.remove('text-gray-600');
+            prodBtn.classList.remove('bg-green-500', 'text-white');
+            prodBtn.classList.add('text-gray-600');
+            indicator.innerHTML = '<i class="fas fa-flask mr-1"></i>Demo Mode';
+            indicator.className = 'text-xs px-2 py-1 rounded bg-amber-100 text-amber-800';
+          } else {
+            prodBtn.classList.add('bg-green-500', 'text-white');
+            prodBtn.classList.remove('text-gray-600');
+            demoBtn.classList.remove('bg-amber-500', 'text-white');
+            demoBtn.classList.add('text-gray-600');
+            indicator.innerHTML = '<i class="fas fa-database mr-1"></i>Production Mode';
+            indicator.className = 'text-xs px-2 py-1 rounded bg-green-100 text-green-800';
+          }
+        }
+        
+        document.querySelectorAll('.mode-toggle-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const mode = btn.dataset.mode;
+            window.API_MODE = mode;
+            window.API_BASE = mode === 'demo' ? '/demo' : '/api';
+            localStorage.setItem('kpi_api_mode', mode);
+            updateModeUI();
+            
+            // Show notification
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in';
+            toast.innerHTML = mode === 'demo' 
+              ? '<i class="fas fa-flask mr-2"></i>Switched to Demo Mode (No database required)'
+              : '<i class="fas fa-database mr-2"></i>Switched to Production Mode (Requires Supabase)';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+          });
+        });
+        
+        // Initialize mode UI on page load
+        document.addEventListener('DOMContentLoaded', updateModeUI);
+        updateModeUI();
+      `}} />
     </div>
   )
 }

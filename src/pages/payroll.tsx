@@ -163,7 +163,7 @@ export const PayrollPage: FC = () => {
       </div>
 
       <script dangerouslySetInnerHTML={{ __html: `
-        const API_BASE = '/api';
+        // Using window.window.API_BASE from Layout;
         let payrollData = [];
 
         // Set default period to current month
@@ -181,7 +181,7 @@ export const PayrollPage: FC = () => {
           }
 
           try {
-            let url = API_BASE + '/payroll/bridge?payrollPeriod=' + payrollPeriod;
+            let url = window.API_BASE + '/payroll/bridge?payrollPeriod=' + payrollPeriod;
             if (warehouseCode) url += '&warehouseCode=' + warehouseCode;
 
             const res = await axios.get(url);
@@ -297,7 +297,7 @@ export const PayrollPage: FC = () => {
           }
 
           try {
-            const res = await axios.post(API_BASE + '/payroll/apply', {
+            const res = await axios.post(window.API_BASE + '/payroll/apply', {
               warehouseCode: warehouseCode || undefined,
               payrollPeriod,
               staffIds: selectedIds

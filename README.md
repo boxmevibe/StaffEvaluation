@@ -4,29 +4,42 @@ Hệ thống quản lý KPI kho vận thế hệ mới với tính năng PPH (Po
 
 ## 📋 URLs
 
-- **Production URL**: [Chờ deploy]
 - **Sandbox URL**: https://3000-ilxxj5go9kierk3waisl7-5634da27.sandbox.novita.ai
 - **Supabase**: https://jubwnkwqkqsmexcyrark.supabase.co
+
+## ✨ Tính năng mới
+
+### Demo Mode
+Hệ thống hỗ trợ 2 chế độ:
+- **Demo Mode**: Sử dụng dữ liệu mẫu tự động generate, không cần database
+- **Production Mode**: Kết nối với Supabase database thực
+
+Chuyển đổi bằng nút toggle ở góc phải header.
+
+### Export CSV
+- Export bảng xếp hạng từ Manager Dashboard
+- Export dữ liệu payroll với đầy đủ thông tin
 
 ## ✅ Đã hoàn thành
 
 ### Core Features
-- ✅ **PPH Calculation** - Tính điểm trên giờ (Points Per Hour) để đo lường hiệu suất
+- ✅ **PPH Calculation** - Tính điểm trên giờ (Points Per Hour)
 - ✅ **Ranking System** - Xếp hạng 1-5 với ngưỡng PPH cấu hình theo kho
 - ✅ **ORS System** - Quản lý 32 loại vi phạm vận hành với 5 mức milestone
 - ✅ **KPI Bonus** - Tự động tính thưởng KPI với Rating Factor và ORS Penalty
+- ✅ **Demo Data** - Dữ liệu mẫu tự động generate để test UI
 
 ### Jobs Pipeline
-- ✅ **Job A** - Build KPI Weekly Summary (tổng hợp điểm tuần, tính PPH)
-- ✅ **Job B** - Compute Ranking Weekly Result (chấm ranking score)
-- ✅ **Job C** - Compute ORS Monthly Summary (tổng hợp ORS tháng)
-- ✅ **Job D** - Build KPI Monthly Summary (tính KPI Bonus, chuẩn bị payroll)
+- ✅ **Job A** - Build KPI Weekly Summary
+- ✅ **Job B** - Compute Ranking Weekly Result
+- ✅ **Job C** - Compute ORS Monthly Summary
+- ✅ **Job D** - Build KPI Monthly Summary
 
 ### User Interfaces
-- ✅ **Employee Dashboard** - Xem KPI cá nhân, PPH, Ranking, ORS
-- ✅ **Manager Dashboard** - Quản lý team, xếp hạng, ghi nhận/review ORS
-- ✅ **Admin Configuration** - Cấu hình Ranking, Role-Task, ORS Catalog, Jobs
-- ✅ **Payroll Interface** - Lấy dữ liệu KPI cho tính lương
+- ✅ **Employee Dashboard** - Xem KPI cá nhân, PPH, Ranking, ORS với charts
+- ✅ **Manager Dashboard** - Quản lý team, xếp hạng, ghi nhận/review ORS, Export CSV
+- ✅ **Admin Configuration** - Cấu hình Ranking, Role-Task, ORS Catalog
+- ✅ **Payroll Interface** - Lấy dữ liệu KPI, Apply payroll, Export CSV
 
 ### API Endpoints
 - ✅ Employee APIs (weekly/monthly KPI, ORS, ranking history)
@@ -34,6 +47,7 @@ Hệ thống quản lý KPI kho vận thế hệ mới với tính năng PPH (Po
 - ✅ Admin APIs (configs, ORS catalog)
 - ✅ Jobs APIs (run individual jobs or full pipeline)
 - ✅ Payroll APIs (get bridge data, apply to payroll)
+- ✅ **Demo APIs** (/demo/*) - Trả về dữ liệu mẫu, không cần database
 
 ## 🔧 Cài đặt
 
@@ -103,6 +117,7 @@ npm run deploy:prod
 2. Chọn Warehouse và Tuần/Tháng
 3. Xem tổng quan KPI team, bảng xếp hạng
 4. Ghi nhận và Review sự cố ORS
+5. **Export CSV** để xuất báo cáo
 
 ### Cho Admin/HR
 1. Vào **Admin Configuration**
@@ -115,6 +130,7 @@ npm run deploy:prod
 2. Chọn kỳ lương và Warehouse
 3. Review dữ liệu KPI
 4. Apply vào payroll
+5. **Export CSV** để xuất dữ liệu
 
 ## 🔗 API Reference
 
@@ -134,6 +150,17 @@ GET /api/manager/ors/alerts?warehouseCode=BMVN_HCM_TP
 GET /api/manager/ors/pending?warehouseCode=BMVN_HCM_TP
 POST /api/manager/ors/create
 POST /api/manager/ors/:eventId/review
+```
+
+### Demo APIs (No database required)
+```
+GET /demo/health
+GET /demo/employee/:staffId/kpi/weekly
+GET /demo/employee/:staffId/kpi/monthly
+GET /demo/manager/dashboard
+GET /demo/manager/ranking
+GET /demo/admin/ors-catalog
+GET /demo/payroll/bridge
 ```
 
 ### Jobs APIs
@@ -201,15 +228,59 @@ KPI Bonus = Major KPI × Amount per Point × Rating Factor × (1 - ORS Penalty)
 - **Frontend**: Hono JSX + TailwindCSS
 - **Backend**: Hono Framework on Cloudflare Workers
 - **Database**: Supabase (PostgreSQL)
+- **Charts**: Chart.js
 - **Deployment**: Cloudflare Pages
+
+## 📁 Project Structure
+
+```
+webapp/
+├── src/
+│   ├── index.tsx           # Main app entry
+│   ├── renderer.tsx        # JSX renderer
+│   ├── components/
+│   │   └── Layout.tsx      # Layout component with Demo/Prod toggle
+│   ├── pages/
+│   │   ├── home.tsx        # Home page
+│   │   ├── employee.tsx    # Employee dashboard
+│   │   ├── manager.tsx     # Manager dashboard
+│   │   ├── admin.tsx       # Admin configuration
+│   │   └── payroll.tsx     # Payroll interface
+│   ├── routes/
+│   │   ├── api.ts          # Production API (Supabase)
+│   │   └── demo.ts         # Demo API (No database)
+│   ├── jobs/
+│   │   ├── jobA.ts         # Weekly KPI summary
+│   │   ├── jobB.ts         # Weekly ranking
+│   │   ├── jobC.ts         # ORS monthly summary
+│   │   ├── jobD.ts         # Monthly KPI summary
+│   │   └── index.ts        # Job exports
+│   ├── lib/
+│   │   ├── supabase.ts     # Supabase client
+│   │   ├── utils.ts        # Utility functions
+│   │   └── export.ts       # Export utilities
+│   └── types/
+│       └── database.ts     # TypeScript types
+├── database/
+│   └── schema.sql          # Database schema
+├── public/
+│   └── static/
+│       └── style.css       # Custom styles
+├── ecosystem.config.cjs    # PM2 configuration
+├── wrangler.jsonc          # Cloudflare configuration
+├── vite.config.ts          # Vite configuration
+├── package.json
+└── README.md
+```
 
 ## 📝 Next Steps
 
-1. **Chạy Schema SQL** trong Supabase để tạo tables
-2. **Import dữ liệu** từ hệ thống cũ vào warehouse_productivity_daily
-3. **Cấu hình role_main_task_config** theo vai trò thực tế của từng kho
-4. **Điều chỉnh ranking_range_config** dựa trên phân tích percentile
-5. **Deploy lên Cloudflare Pages** cho production
+1. ✅ Chạy Schema SQL trong Supabase để tạo tables
+2. ✅ Test với Demo Mode (không cần database)
+3. 🔄 Import dữ liệu từ hệ thống cũ vào warehouse_productivity_daily
+4. 🔄 Cấu hình role_main_task_config theo vai trò thực tế
+5. 🔄 Điều chỉnh ranking_range_config dựa trên phân tích percentile
+6. ⏳ Deploy lên Cloudflare Pages cho production
 
 ---
 

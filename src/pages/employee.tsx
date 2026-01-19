@@ -207,7 +207,7 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
 
       {/* JavaScript for fetching and displaying data */}
       <script dangerouslySetInnerHTML={{ __html: `
-        const API_BASE = '/api';
+        // Use dynamic API_BASE from Layout (demo or api)
         let rankingChart = null;
 
         document.getElementById('employee-search-form').addEventListener('submit', async (e) => {
@@ -232,16 +232,16 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
             if (yearWeek) params.append('yearWeek', yearWeek.replace('-W', '-W'));
 
             // Fetch weekly KPI
-            const weeklyRes = await axios.get(\`\${API_BASE}/employee/\${staffId}/kpi/weekly?\${params}\`);
+            const weeklyRes = await axios.get(\`\${window.API_BASE}/employee/\${staffId}/kpi/weekly?\${params}\`);
             
             // Fetch monthly KPI
-            const monthlyRes = await axios.get(\`\${API_BASE}/employee/\${staffId}/kpi/monthly?\${params}\`);
+            const monthlyRes = await axios.get(\`\${window.API_BASE}/employee/\${staffId}/kpi/monthly?\${params}\`);
             
             // Fetch ORS
-            const orsRes = await axios.get(\`\${API_BASE}/employee/\${staffId}/ors?\${params}\`);
+            const orsRes = await axios.get(\`\${window.API_BASE}/employee/\${staffId}/ors?\${params}\`);
             
             // Fetch ranking history
-            const historyRes = await axios.get(\`\${API_BASE}/employee/\${staffId}/ranking/history?limit=12&\${params}\`);
+            const historyRes = await axios.get(\`\${window.API_BASE}/employee/\${staffId}/ranking/history?limit=12&\${params}\`);
 
             // Show dashboard
             document.getElementById('empty-state').classList.add('hidden');

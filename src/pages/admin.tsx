@@ -248,7 +248,7 @@ export const AdminPage: FC = () => {
       </div>
 
       <script dangerouslySetInnerHTML={{ __html: `
-        const API_BASE = '/api';
+        // Using window.window.API_BASE from Layout;
         let orsCatalogData = [];
 
         // Set default dates
@@ -283,7 +283,7 @@ export const AdminPage: FC = () => {
         async function loadRankingConfig() {
           try {
             const warehouse = document.getElementById('ranking-warehouse-filter').value;
-            const url = API_BASE + '/admin/ranking-config' + (warehouse ? '?warehouseCode=' + warehouse : '');
+            const url = window.API_BASE + '/admin/ranking-config' + (warehouse ? '?warehouseCode=' + warehouse : '');
             const res = await axios.get(url);
             const data = res.data.data || [];
 
@@ -311,7 +311,7 @@ export const AdminPage: FC = () => {
 
         async function loadRoleConfig() {
           try {
-            const res = await axios.get(API_BASE + '/admin/role-task-config');
+            const res = await axios.get(window.API_BASE + '/admin/role-task-config');
             const data = res.data.data || [];
 
             document.getElementById('role-config-body').innerHTML = data.map(r => \`
@@ -337,7 +337,7 @@ export const AdminPage: FC = () => {
 
         async function loadOrsCatalog() {
           try {
-            const res = await axios.get(API_BASE + '/admin/ors-catalog');
+            const res = await axios.get(window.API_BASE + '/admin/ors-catalog');
             orsCatalogData = res.data.data || [];
             renderOrsCatalog(orsCatalogData);
           } catch (error) {
@@ -384,7 +384,7 @@ export const AdminPage: FC = () => {
 
         async function loadBonusConfig() {
           try {
-            const res = await axios.get(API_BASE + '/admin/bonus-config');
+            const res = await axios.get(window.API_BASE + '/admin/bonus-config');
             const data = res.data.data || [];
 
             document.getElementById('bonus-config-body').innerHTML = data.map(b => \`
@@ -427,7 +427,7 @@ export const AdminPage: FC = () => {
             document.getElementById('job-results').classList.remove('hidden');
             document.getElementById('job-output').textContent = 'Running Job ' + job.toUpperCase() + '...';
 
-            const res = await axios.post(API_BASE + urls[job], body);
+            const res = await axios.post(window.API_BASE + urls[job], body);
             document.getElementById('job-output').textContent = JSON.stringify(res.data, null, 2);
           } catch (error) {
             document.getElementById('job-output').textContent = 'Error: ' + (error.response?.data?.error || error.message);
@@ -443,7 +443,7 @@ export const AdminPage: FC = () => {
             document.getElementById('job-results').classList.remove('hidden');
             document.getElementById('job-output').textContent = 'Running full pipeline...';
 
-            const res = await axios.post(API_BASE + '/jobs/run-pipeline', {
+            const res = await axios.post(window.API_BASE + '/jobs/run-pipeline', {
               warehouseCode: warehouse || undefined,
               yearWeek: yearWeek || undefined,
               payrollPeriod: payrollPeriod || undefined
