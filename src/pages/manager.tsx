@@ -6,42 +6,48 @@ export const ManagerPage: FC = () => {
   const warehouses = Object.entries(WAREHOUSES)
 
   return (
-    <Layout title="Dashboard Quản lý Kho" activeTab="manager">
-      {/* Warehouse Selector */}
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-        <div class="grid md:grid-cols-4 gap-4">
+    <Layout title="Quản lý" activeTab="manager">
+      {/* Page Header */}
+      <div class="mb-4">
+        <p class="text-sm text-gray-500">Theo dõi KPI, lỗi ORS và xếp hạng nhân viên theo kho.</p>
+      </div>
+
+      {/* Filter Section - Mobile Responsive */}
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Warehouse</label>
-            <select 
-              id="warehouseCode" 
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+            <label class="block text-sm font-medium text-gray-700 mb-1">Kho</label>
+            <select
+              id="warehouseCode"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px] focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">-- Chọn kho --</option>
+              <option value="">Chọn kho...</option>
               {warehouses.map(([code, info]) => (
-                <option value={code}>{code} - {info.name}</option>
+                <option value={code}>{code} – {info.name}</option>
               ))}
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Tuần</label>
-            <input 
-              type="week" 
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tuần KPI</label>
+            <input
+              type="week"
               id="yearWeek"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px] focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Tháng (Payroll)</label>
-            <input 
-              type="month" 
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tháng tính lương</label>
+            <input
+              type="month"
               id="payrollPeriod"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px] focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div class="flex items-end">
-            <button 
+            <button
               onclick="loadDashboard()"
-              class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700"
+              id="btn-load-dashboard"
+              class="w-full bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 min-h-[44px]"
             >
               <i class="fas fa-sync-alt mr-2"></i>
               Tải dữ liệu
@@ -50,84 +56,96 @@ export const ManagerPage: FC = () => {
         </div>
       </div>
 
-      {/* Stats Overview */}
-      <div class="grid md:grid-cols-4 gap-6 mb-6">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-500">Tổng nhân viên</p>
-              <p class="text-3xl font-bold text-gray-900 mt-1" id="stat-total-staff">--</p>
+      {/* KPI Cards - Mobile Responsive */}
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <p class="text-xs md:text-sm font-medium text-gray-500">Tổng nhân viên</p>
+              <p class="text-2xl md:text-3xl font-bold text-gray-900 mt-1" id="stat-total-staff">--</p>
+              <p class="text-xs text-gray-400 mt-1 hidden md:block">Có ca trong tuần</p>
             </div>
-            <div class="bg-blue-500 p-4 rounded-xl">
-              <i class="fas fa-users text-white text-2xl"></i>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-500">PPH Trung bình</p>
-              <p class="text-3xl font-bold text-gray-900 mt-1" id="stat-avg-pph">--</p>
-            </div>
-            <div class="bg-green-500 p-4 rounded-xl">
-              <i class="fas fa-tachometer-alt text-white text-2xl"></i>
+            <div class="bg-blue-500 p-3 md:p-4 rounded-xl flex-shrink-0">
+              <i class="fas fa-users text-white text-lg md:text-2xl"></i>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-500">Tổng điểm</p>
-              <p class="text-3xl font-bold text-gray-900 mt-1" id="stat-total-points">--</p>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <p class="text-xs md:text-sm font-medium text-gray-500">PPH trung bình</p>
+              <p class="text-2xl md:text-3xl font-bold text-gray-900 mt-1" id="stat-avg-pph">--</p>
+              <p class="text-xs text-gray-400 mt-1 hidden md:block">Đơn/giờ toàn kho</p>
             </div>
-            <div class="bg-purple-500 p-4 rounded-xl">
-              <i class="fas fa-star text-white text-2xl"></i>
+            <div class="bg-green-500 p-3 md:p-4 rounded-xl flex-shrink-0">
+              <i class="fas fa-tachometer-alt text-white text-lg md:text-2xl"></i>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-500">ORS Alerts</p>
-              <p class="text-3xl font-bold text-red-600 mt-1" id="stat-ors-alerts">--</p>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <p class="text-xs md:text-sm font-medium text-gray-500">Tổng điểm KPI</p>
+              <p class="text-2xl md:text-3xl font-bold text-gray-900 mt-1" id="stat-total-points">--</p>
+              <p class="text-xs text-gray-400 mt-1 hidden md:block">Điểm nhiệm vụ chính</p>
             </div>
-            <div class="bg-red-500 p-4 rounded-xl">
-              <i class="fas fa-exclamation-triangle text-white text-2xl"></i>
+            <div class="bg-purple-500 p-3 md:p-4 rounded-xl flex-shrink-0">
+              <i class="fas fa-star text-white text-lg md:text-2xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <p class="text-xs md:text-sm font-medium text-gray-500">Cảnh báo ORS</p>
+              <p class="text-2xl md:text-3xl font-bold text-red-600 mt-1" id="stat-ors-alerts">--</p>
+              <p class="text-xs text-gray-400 mt-1 hidden md:block">≥10 điểm lỗi/tháng</p>
+            </div>
+            <div class="bg-red-500 p-3 md:p-4 rounded-xl flex-shrink-0">
+              <i class="fas fa-exclamation-triangle text-white text-lg md:text-2xl"></i>
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Content Grid */}
-      <div class="grid md:grid-cols-3 gap-6 mb-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
         {/* Ranking Distribution */}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">
-            <i class="fas fa-chart-pie text-blue-600 mr-2"></i>
-            Phân bố Ranking
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+          <h3 class="text-base md:text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <i class="fas fa-chart-pie text-blue-600"></i>
+            Phân bố mức xếp hạng
           </h3>
-          <div class="h-48">
+          <div class="h-40 md:h-48">
             <canvas id="ranking-distribution-chart"></canvas>
           </div>
-          <div id="ranking-distribution-legend" class="mt-4 grid grid-cols-5 gap-2 text-center text-sm">
-            <div><span class="block font-bold text-green-600" id="rank-5-count">0</span>Rank 5</div>
-            <div><span class="block font-bold text-blue-600" id="rank-4-count">0</span>Rank 4</div>
-            <div><span class="block font-bold text-yellow-600" id="rank-3-count">0</span>Rank 3</div>
-            <div><span class="block font-bold text-orange-600" id="rank-2-count">0</span>Rank 2</div>
-            <div><span class="block font-bold text-red-600" id="rank-1-count">0</span>Rank 1</div>
+          <div id="ranking-distribution-legend" class="mt-3 md:mt-4 grid grid-cols-5 gap-1 md:gap-2 text-center text-xs md:text-sm">
+            <div><span class="block font-bold text-green-600" id="rank-5-count">0</span>5⭐</div>
+            <div><span class="block font-bold text-blue-600" id="rank-4-count">0</span>4⭐</div>
+            <div><span class="block font-bold text-yellow-600" id="rank-3-count">0</span>3⭐</div>
+            <div><span class="block font-bold text-orange-600" id="rank-2-count">0</span>2⭐</div>
+            <div><span class="block font-bold text-red-600" id="rank-1-count">0</span>1⭐</div>
           </div>
         </div>
 
-        {/* Top Performers */}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 col-span-2">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">
-            <i class="fas fa-trophy text-yellow-500 mr-2"></i>
+        {/* Top 10 Performers */}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 lg:col-span-2">
+          <h3 class="text-base md:text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <i class="fas fa-trophy text-yellow-500"></i>
             Top 10 Nhân viên
+            <span class="text-xs font-normal text-gray-500 ml-2 hidden md:inline">Điểm KPI cao nhất tuần</span>
           </h3>
-          <div class="overflow-x-auto">
+
+          {/* Mobile Card View */}
+          <div id="top-performers-cards" class="md:hidden space-y-2">
+            <p class="text-gray-500 text-center py-4">Chọn kho và tuần để xem dữ liệu</p>
+          </div>
+
+          {/* Desktop Table View */}
+          <div class="hidden md:block overflow-x-auto">
             <table class="w-full">
               <thead class="bg-gray-50">
                 <tr>
@@ -135,11 +153,11 @@ export const ManagerPage: FC = () => {
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Nhân viên</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">PPH</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Điểm</th>
-                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Ranking</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Xếp hạng</th>
                 </tr>
               </thead>
               <tbody id="top-performers-body" class="divide-y divide-gray-200">
-                <tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">Chọn kho để xem dữ liệu</td></tr>
+                <tr><td colSpan={5} class="px-4 py-8 text-center text-gray-500">Chọn kho và tuần để xem dữ liệu</td></tr>
               </tbody>
             </table>
           </div>
@@ -147,89 +165,103 @@ export const ManagerPage: FC = () => {
       </div>
 
       {/* ORS Section */}
-      <div class="grid md:grid-cols-2 gap-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
         {/* ORS Alerts */}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">
-            <i class="fas fa-bell text-red-600 mr-2"></i>
-            Cảnh báo ORS (≥10 điểm)
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+          <h3 class="text-base md:text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <i class="fas fa-bell text-red-600"></i>
+            Nhân viên có nhiều lỗi ORS
+            <span class="text-xs font-normal text-gray-500">(≥10 điểm)</span>
           </h3>
-          <div id="ors-alerts-list" class="space-y-3 max-h-80 overflow-y-auto">
-            <p class="text-gray-500 text-center py-4">Không có cảnh báo</p>
+          <div id="ors-alerts-list" class="space-y-2 md:space-y-3 max-h-72 md:max-h-80 overflow-y-auto">
+            <p class="text-gray-500 text-center py-4">Không có nhân viên nào đạt ngưỡng cảnh báo.</p>
           </div>
         </div>
 
         {/* Pending ORS Review */}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">
-            <i class="fas fa-clipboard-check text-orange-600 mr-2"></i>
-            ORS Chờ Review
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+          <h3 class="text-base md:text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <i class="fas fa-clipboard-check text-orange-600"></i>
+            Lỗi ORS chờ xác nhận
             <span id="pending-count" class="ml-2 bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full text-sm">0</span>
           </h3>
-          <div id="pending-ors-list" class="space-y-3 max-h-80 overflow-y-auto">
-            <p class="text-gray-500 text-center py-4">Không có ORS chờ review</p>
+          <div id="pending-ors-list" class="space-y-2 md:space-y-3 max-h-72 md:max-h-80 overflow-y-auto">
+            <p class="text-gray-500 text-center py-4">Hiện không có lỗi ORS nào cần duyệt.</p>
           </div>
         </div>
       </div>
 
-      {/* Create ORS Event Modal Trigger */}
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">
-          <i class="fas fa-plus-circle text-blue-600 mr-2"></i>
-          Ghi nhận sự cố ORS
+      {/* Create ORS Form */}
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 mb-6">
+        <h3 class="text-base md:text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
+          <i class="fas fa-plus-circle text-blue-600"></i>
+          Ghi nhận lỗi ORS
         </h3>
-        <form id="create-ors-form" class="grid md:grid-cols-3 gap-4">
+        <p class="text-sm text-gray-500 mb-4">Ghi nhận lỗi phát sinh trong ca làm việc để trừ điểm ORS.</p>
+
+        <form id="create-ors-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Mã nhân viên *</label>
-            <input type="text" id="ors-staff-id" required class="w-full border border-gray-300 rounded-lg px-3 py-2" />
+            <input type="text" id="ors-staff-id" required class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px]" placeholder="Nhập mã NV" />
+            <p class="text-xs text-gray-400 mt-1">Mã trong hệ thống HR</p>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Tên nhân viên</label>
-            <input type="text" id="ors-staff-name" class="w-full border border-gray-300 rounded-lg px-3 py-2" />
+            <input type="text" id="ors-staff-name" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px]" placeholder="Để dễ nhận diện" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Ngày vi phạm *</label>
-            <input type="date" id="ors-event-date" required class="w-full border border-gray-300 rounded-lg px-3 py-2" />
+            <input type="date" id="ors-event-date" required class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px]" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Loại vi phạm *</label>
-            <select id="ors-code" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
-              <option value="">-- Chọn loại vi phạm --</option>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Loại lỗi ORS *</label>
+            <select id="ors-code" required class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px]">
+              <option value="">Chọn loại lỗi...</option>
             </select>
           </div>
           <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
-            <input type="text" id="ors-description" class="w-full border border-gray-300 rounded-lg px-3 py-2" placeholder="Mô tả chi tiết sự cố..." />
+            <label class="block text-sm font-medium text-gray-700 mb-1">Mô tả chi tiết</label>
+            <input type="text" id="ors-description" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px]" placeholder="Ca nào, lỗi gì, ở đâu..." />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Người báo cáo *</label>
-            <input type="text" id="ors-reported-by" required class="w-full border border-gray-300 rounded-lg px-3 py-2" />
+            <input type="text" id="ors-reported-by" required class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px]" placeholder="Tên hoặc mã NV báo cáo" />
           </div>
           <div class="md:col-span-2 flex items-end">
-            <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-red-700">
+            <button type="submit" class="w-full md:w-auto bg-red-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-red-700 min-h-[44px]">
               <i class="fas fa-plus mr-2"></i>
-              Tạo ORS Event
+              Ghi nhận lỗi ORS
             </button>
           </div>
         </form>
       </div>
 
       {/* Full Ranking Table */}
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold text-gray-900">
-            <i class="fas fa-list-ol text-purple-600 mr-2"></i>
-            Bảng xếp hạng đầy đủ
-          </h3>
-          <button 
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-4">
+          <div>
+            <h3 class="text-base md:text-lg font-bold text-gray-900 flex items-center gap-2">
+              <i class="fas fa-list-ol text-purple-600"></i>
+              Bảng xếp hạng đầy đủ
+            </h3>
+            <p class="text-sm text-gray-500">Xem chi tiết xếp hạng tất cả nhân viên.</p>
+          </div>
+          <button
             onclick="exportRankingCSV()"
-            class="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 text-sm"
+            class="bg-green-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-green-700 text-sm min-h-[44px]"
           >
             <i class="fas fa-file-csv mr-2"></i>
-            Export CSV
+            Xuất file CSV
           </button>
         </div>
-        <div class="overflow-x-auto">
+
+        {/* Mobile Card View */}
+        <div id="full-ranking-cards" class="md:hidden space-y-2">
+          <p class="text-gray-500 text-center py-4">Chọn kho và tuần để xem dữ liệu</p>
+        </div>
+
+        {/* Desktop Table View */}
+        <div class="hidden md:block overflow-x-auto">
           <table class="w-full">
             <thead class="bg-gray-50">
               <tr>
@@ -237,20 +269,21 @@ export const ManagerPage: FC = () => {
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Mã NV</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Tên</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">PPH</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Main Task Points</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Điểm nhiệm vụ</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Giờ làm</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Ranking</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Status</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Xếp hạng</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Trạng thái</th>
               </tr>
             </thead>
             <tbody id="full-ranking-body" class="divide-y divide-gray-200">
-              <tr><td colspan="8" class="px-4 py-8 text-center text-gray-500">Chọn kho để xem dữ liệu</td></tr>
+              <tr><td colSpan={8} class="px-4 py-8 text-center text-gray-500">Chọn kho và tuần để xem dữ liệu</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <script dangerouslySetInnerHTML={{ __html: `
+      <script dangerouslySetInnerHTML={{
+        __html: `
         // Using window.API_BASE from Layout;
         let distributionChart = null;
         let orsCatalog = [];
@@ -326,7 +359,8 @@ export const ManagerPage: FC = () => {
             const rankings = rankRes.data.data || [];
             rankingData = rankings; // Store for export
 
-            // Top 10
+            // Top 10 - Desktop Table
+            const rankStars = { 5: '5\u2b50', 4: '4\u2b50', 3: '3\u2b50', 2: '2\u2b50', 1: '1\u2b50' };
             document.getElementById('top-performers-body').innerHTML = rankings.slice(0, 10).map((r, i) => {
               const colors = { 5: 'bg-green-500', 4: 'bg-blue-500', 3: 'bg-yellow-500', 2: 'bg-orange-500', 1: 'bg-red-500' };
               return \`
@@ -343,11 +377,34 @@ export const ManagerPage: FC = () => {
                   </td>
                 </tr>
               \`;
-            }).join('') || '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">Không có dữ liệu</td></tr>';
+            }).join('') || '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">Kh\u00f4ng c\u00f3 d\u1eef li\u1ec7u</td></tr>';
 
-            // Full ranking
+            // Top 10 - Mobile Cards
+            document.getElementById('top-performers-cards').innerHTML = rankings.slice(0, 10).map((r, i) => {
+              const bgColors = { 5: 'border-l-green-500', 4: 'border-l-blue-500', 3: 'border-l-yellow-500', 2: 'border-l-orange-500', 1: 'border-l-red-500' };
+              const isTop3 = i < 3;
+              return \`
+                <div class="p-3 bg-white border border-gray-200 rounded-lg border-l-4 \${bgColors[r.ranking_score]} \${isTop3 ? 'bg-yellow-50' : ''}">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <span class="font-bold text-gray-900">#\${i + 1}</span>
+                      <span class="font-medium ml-2">\${r.staff_name || r.staff_id}</span>
+                      <div class="text-xs text-gray-500">\${r.staff_id}</div>
+                    </div>
+                    <span class="text-sm font-bold">\${rankStars[r.ranking_score]}</span>
+                  </div>
+                  <div class="mt-2 text-sm text-gray-600">
+                    PPH: <span class="font-bold text-blue-600">\${r.pph.toFixed(2)}</span> | 
+                    \u0110i\u1ec3m: <span class="font-bold">\${r.main_task_points.toLocaleString()}</span>
+                  </div>
+                </div>
+              \`;
+            }).join('') || '<p class="text-gray-500 text-center py-4">Kh\u00f4ng c\u00f3 d\u1eef li\u1ec7u</p>';
+
+            // Full ranking - Desktop Table
             document.getElementById('full-ranking-body').innerHTML = rankings.map((r, i) => {
               const colors = { 5: 'bg-green-500', 4: 'bg-blue-500', 3: 'bg-yellow-500', 2: 'bg-orange-500', 1: 'bg-red-500' };
+              const statusLabels = { FINAL: '\u0110\u1ee7 d\u1eef li\u1ec7u', INSUFFICIENT_DATA: 'Thi\u1ebfu d\u1eef li\u1ec7u', PENDING_REVIEW: 'Ch\u1edd duy\u1ec7t' };
               const statusColors = { FINAL: 'text-green-600', INSUFFICIENT_DATA: 'text-yellow-600', PENDING_REVIEW: 'text-orange-600' };
               return \`
                 <tr class="hover:bg-gray-50">
@@ -360,10 +417,34 @@ export const ManagerPage: FC = () => {
                   <td class="px-4 py-2">
                     <span class="\${colors[r.ranking_score]} text-white px-2 py-1 rounded-full text-sm font-bold">\${r.ranking_score}</span>
                   </td>
-                  <td class="px-4 py-2 \${statusColors[r.status] || ''} text-sm">\${r.status}</td>
+                  <td class="px-4 py-2 \${statusColors[r.status] || ''} text-sm">\${statusLabels[r.status] || r.status}</td>
                 </tr>
               \`;
-            }).join('') || '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500">Không có dữ liệu</td></tr>';
+            }).join('') || '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500">Kh\u00f4ng c\u00f3 d\u1eef li\u1ec7u</td></tr>';
+
+            // Full ranking - Mobile Cards
+            document.getElementById('full-ranking-cards').innerHTML = rankings.map((r, i) => {
+              const bgColors = { 5: 'border-l-green-500', 4: 'border-l-blue-500', 3: 'border-l-yellow-500', 2: 'border-l-orange-500', 1: 'border-l-red-500' };
+              const statusLabels = { FINAL: '\u0110\u1ee7 d\u1eef li\u1ec7u', INSUFFICIENT_DATA: 'Thi\u1ebfu d\u1eef li\u1ec7u', PENDING_REVIEW: 'Ch\u1edd duy\u1ec7t' };
+              return \`
+                <div class="p-3 bg-white border border-gray-200 rounded-lg border-l-4 \${bgColors[r.ranking_score]}">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <span class="text-xs text-gray-400">#\${i + 1}</span>
+                      <span class="font-medium ml-1">\${r.staff_name || r.staff_id}</span>
+                      <div class="text-xs text-gray-500 font-mono">\${r.staff_id}</div>
+                    </div>
+                    <span class="text-sm font-bold">\${rankStars[r.ranking_score]}</span>
+                  </div>
+                  <div class="mt-2 text-xs text-gray-600 flex flex-wrap gap-x-3">
+                    <span>PPH: <span class="font-bold text-blue-600">\${r.pph.toFixed(2)}</span></span>
+                    <span>\u0110i\u1ec3m: <span class="font-bold">\${r.main_task_points.toLocaleString()}</span></span>
+                    <span>Gi\u1edd: \${r.estimated_work_hours.toFixed(1)}h</span>
+                  </div>
+                  <div class="mt-1 text-xs text-gray-500">\${statusLabels[r.status] || r.status}</div>
+                </div>
+              \`;
+            }).join('') || '<p class="text-gray-500 text-center py-4">Kh\u00f4ng c\u00f3 d\u1eef li\u1ec7u</p>';
 
             // Load ORS alerts
             const alertRes = await axios.get(window.API_BASE + '/manager/ors/alerts?warehouseCode=' + warehouseCode + '&payrollPeriod=' + payrollPeriod);

@@ -1,4 +1,4 @@
-// API Routes for KPI Warehouse Management System
+// API Routes for Perfomance Management System
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { createSupabaseClient } from '../lib/supabase'
@@ -27,7 +27,7 @@ api.get('/employee/:staffId/kpi/weekly', async (c) => {
   const staffId = c.req.param('staffId')
   const yearWeek = c.req.query('yearWeek') || getCurrentWeek()
   const warehouseCode = c.req.query('warehouseCode')
-  
+
   const supabase = createSupabaseClient()
 
   let query = supabase
@@ -35,7 +35,7 @@ api.get('/employee/:staffId/kpi/weekly', async (c) => {
     .select('*')
     .eq('staff_id', staffId)
     .eq('year_week', yearWeek)
-  
+
   if (warehouseCode) {
     query = query.eq('warehouse_code', warehouseCode)
   }
@@ -52,7 +52,7 @@ api.get('/employee/:staffId/kpi/weekly', async (c) => {
     .select('*')
     .eq('staff_id', staffId)
     .eq('year_week', yearWeek)
-  
+
   if (warehouseCode) {
     rankingQuery = rankingQuery.eq('warehouse_code', warehouseCode)
   }
@@ -66,7 +66,7 @@ api.get('/employee/:staffId/kpi/weekly', async (c) => {
     .select('pph, main_task_points, total_points')
     .eq('staff_id', staffId)
     .eq('year_week', prevWeek)
-  
+
   if (warehouseCode) {
     prevQuery = prevQuery.eq('warehouse_code', warehouseCode)
   }
@@ -92,7 +92,7 @@ api.get('/employee/:staffId/kpi/monthly', async (c) => {
   const staffId = c.req.param('staffId')
   const payrollPeriod = c.req.query('payrollPeriod') || getPayrollPeriod(new Date())
   const warehouseCode = c.req.query('warehouseCode')
-  
+
   const supabase = createSupabaseClient()
 
   let query = supabase
@@ -100,7 +100,7 @@ api.get('/employee/:staffId/kpi/monthly', async (c) => {
     .select('*')
     .eq('staff_id', staffId)
     .eq('payroll_period', payrollPeriod)
-  
+
   if (warehouseCode) {
     query = query.eq('warehouse_code', warehouseCode)
   }
@@ -120,11 +120,11 @@ api.get('/employee/:staffId/kpi/daily', async (c) => {
   const startDate = c.req.query('startDate')
   const endDate = c.req.query('endDate')
   const warehouseCode = c.req.query('warehouseCode')
-  
+
   if (!startDate || !endDate) {
     return c.json({ success: false, error: 'startDate and endDate are required' }, 400)
   }
-  
+
   const supabase = createSupabaseClient()
 
   let query = supabase
@@ -134,7 +134,7 @@ api.get('/employee/:staffId/kpi/daily', async (c) => {
     .gte('date', startDate)
     .lte('date', endDate)
     .order('date', { ascending: false })
-  
+
   if (warehouseCode) {
     query = query.eq('warehouse_code', warehouseCode)
   }
@@ -153,7 +153,7 @@ api.get('/employee/:staffId/ors', async (c) => {
   const staffId = c.req.param('staffId')
   const payrollPeriod = c.req.query('payrollPeriod') || getPayrollPeriod(new Date())
   const warehouseCode = c.req.query('warehouseCode')
-  
+
   const supabase = createSupabaseClient()
 
   // Get monthly summary
@@ -162,7 +162,7 @@ api.get('/employee/:staffId/ors', async (c) => {
     .select('*')
     .eq('staff_id', staffId)
     .eq('payroll_period', payrollPeriod)
-  
+
   if (warehouseCode) {
     summaryQuery = summaryQuery.eq('warehouse_code', warehouseCode)
   }
@@ -181,7 +181,7 @@ api.get('/employee/:staffId/ors', async (c) => {
     .gte('event_date', startDate)
     .lte('event_date', endDate)
     .order('event_date', { ascending: false })
-  
+
   if (warehouseCode) {
     eventsQuery = eventsQuery.eq('warehouse_code', warehouseCode)
   }
@@ -202,7 +202,7 @@ api.get('/employee/:staffId/ranking/history', async (c) => {
   const staffId = c.req.param('staffId')
   const limit = parseInt(c.req.query('limit') || '12')
   const warehouseCode = c.req.query('warehouseCode')
-  
+
   const supabase = createSupabaseClient()
 
   let query = supabase
@@ -211,7 +211,7 @@ api.get('/employee/:staffId/ranking/history', async (c) => {
     .eq('staff_id', staffId)
     .order('year_week', { ascending: false })
     .limit(limit)
-  
+
   if (warehouseCode) {
     query = query.eq('warehouse_code', warehouseCode)
   }
@@ -231,11 +231,11 @@ api.get('/employee/:staffId/ranking/history', async (c) => {
 api.get('/manager/dashboard', async (c) => {
   const warehouseCode = c.req.query('warehouseCode')
   const yearWeek = c.req.query('yearWeek') || getCurrentWeek()
-  
+
   if (!warehouseCode) {
     return c.json({ success: false, error: 'warehouseCode is required' }, 400)
   }
-  
+
   const supabase = createSupabaseClient()
 
   // Get weekly summaries for the warehouse
@@ -287,11 +287,11 @@ api.get('/manager/ranking', async (c) => {
   const role = c.req.query('role')
   const limit = parseInt(c.req.query('limit') || '100')
   const offset = parseInt(c.req.query('offset') || '0')
-  
+
   if (!warehouseCode) {
     return c.json({ success: false, error: 'warehouseCode is required' }, 400)
   }
-  
+
   const supabase = createSupabaseClient()
 
   // Get ranking data
@@ -339,11 +339,11 @@ api.get('/manager/ranking', async (c) => {
 api.get('/manager/ors/alerts', async (c) => {
   const warehouseCode = c.req.query('warehouseCode')
   const payrollPeriod = c.req.query('payrollPeriod') || getPayrollPeriod(new Date())
-  
+
   if (!warehouseCode) {
     return c.json({ success: false, error: 'warehouseCode is required' }, 400)
   }
-  
+
   const supabase = createSupabaseClient()
 
   // Get staff with ORS above warning threshold
@@ -365,11 +365,11 @@ api.get('/manager/ors/alerts', async (c) => {
 // Get pending ORS events for review
 api.get('/manager/ors/pending', async (c) => {
   const warehouseCode = c.req.query('warehouseCode')
-  
+
   if (!warehouseCode) {
     return c.json({ success: false, error: 'warehouseCode is required' }, 400)
   }
-  
+
   const supabase = createSupabaseClient()
 
   const { data, error } = await supabase
@@ -501,7 +501,7 @@ api.get('/admin/ors-catalog', async (c) => {
 // Get ranking configs
 api.get('/admin/ranking-config', async (c) => {
   const warehouseCode = c.req.query('warehouseCode')
-  
+
   const supabase = createSupabaseClient()
 
   let query = supabase
@@ -509,7 +509,7 @@ api.get('/admin/ranking-config', async (c) => {
     .select('*')
     .eq('is_active', true)
     .order('ranking_score', { ascending: false })
-  
+
   if (warehouseCode) {
     query = query.or(`warehouse_code.is.null,warehouse_code.eq.${warehouseCode}`)
   }
@@ -966,7 +966,7 @@ api.get('/admin/bonus-config/all', async (c) => {
 api.post('/jobs/run-a', async (c) => {
   const body = await c.req.json()
   const { yearWeek, warehouseCode } = body
-  
+
   const supabase = createSupabaseClient()
   const result = await runJobA(supabase, { yearWeek, warehouseCode })
 
@@ -977,7 +977,7 @@ api.post('/jobs/run-a', async (c) => {
 api.post('/jobs/run-b', async (c) => {
   const body = await c.req.json()
   const { yearWeek, warehouseCode } = body
-  
+
   const supabase = createSupabaseClient()
   const result = await runJobB(supabase, { yearWeek, warehouseCode })
 
@@ -988,7 +988,7 @@ api.post('/jobs/run-b', async (c) => {
 api.post('/jobs/run-c', async (c) => {
   const body = await c.req.json()
   const { payrollPeriod, warehouseCode } = body
-  
+
   const supabase = createSupabaseClient()
   const result = await runJobC(supabase, { payrollPeriod, warehouseCode })
 
@@ -999,7 +999,7 @@ api.post('/jobs/run-c', async (c) => {
 api.post('/jobs/run-d', async (c) => {
   const body = await c.req.json()
   const { payrollPeriod, warehouseCode } = body
-  
+
   const supabase = createSupabaseClient()
   const result = await runJobD(supabase, { payrollPeriod, warehouseCode })
 
@@ -1010,7 +1010,7 @@ api.post('/jobs/run-d', async (c) => {
 api.post('/jobs/run-pipeline', async (c) => {
   const body = await c.req.json()
   const { yearWeek, payrollPeriod, warehouseCode } = body
-  
+
   const supabase = createSupabaseClient()
   const result = await runPipeline(supabase, { yearWeek, payrollPeriod, warehouseCode })
 
@@ -1023,11 +1023,11 @@ api.post('/jobs/run-pipeline', async (c) => {
 api.get('/payroll/bridge', async (c) => {
   const warehouseCode = c.req.query('warehouseCode')
   const payrollPeriod = c.req.query('payrollPeriod')
-  
+
   if (!payrollPeriod) {
     return c.json({ success: false, error: 'payrollPeriod is required' }, 400)
   }
-  
+
   const supabase = createSupabaseClient()
 
   let query = supabase
@@ -1035,7 +1035,7 @@ api.get('/payroll/bridge', async (c) => {
     .select('*')
     .eq('payroll_period', payrollPeriod)
     .order('staff_id')
-  
+
   if (warehouseCode) {
     query = query.eq('warehouse_code', warehouseCode)
   }
@@ -1053,11 +1053,11 @@ api.get('/payroll/bridge', async (c) => {
 api.post('/payroll/apply', async (c) => {
   const body = await c.req.json()
   const { warehouseCode, payrollPeriod, staffIds } = body
-  
+
   if (!payrollPeriod) {
     return c.json({ success: false, error: 'payrollPeriod is required' }, 400)
   }
-  
+
   const supabase = createSupabaseClient()
 
   let query = supabase
@@ -1067,11 +1067,11 @@ api.post('/payroll/apply', async (c) => {
       applied_at: new Date().toISOString(),
     })
     .eq('payroll_period', payrollPeriod)
-  
+
   if (warehouseCode) {
     query = query.eq('warehouse_code', warehouseCode)
   }
-  
+
   if (staffIds && staffIds.length > 0) {
     query = query.in('staff_id', staffIds)
   }

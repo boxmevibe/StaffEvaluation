@@ -1,4 +1,4 @@
-// Seed Data Generator for KPI Warehouse System
+// Seed Data Generator for Performance System
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { createSupabaseClient } from '../lib/supabase'
@@ -31,7 +31,7 @@ const EMPLOYEES_PER_WAREHOUSE = [
   { staff_id: 'NV013', staff_name: 'Phan Văn Oanh', role: 'Packer', warehouse: 'BMVN_HCM_TP' },
   { staff_id: 'NV014', staff_name: 'Trịnh Thị Phương', role: 'Handover Staff', warehouse: 'BMVN_HCM_TP' },
   { staff_id: 'NV015', staff_name: 'Vũ Văn Quang', role: 'Picker', warehouse: 'BMVN_HCM_TP' },
-  
+
   // BMVN_HCM_TT - 10 employees
   { staff_id: 'NV101', staff_name: 'Nguyễn Văn Rồng', role: 'Packer', warehouse: 'BMVN_HCM_TT' },
   { staff_id: 'NV102', staff_name: 'Trần Thị Sen', role: 'Picker', warehouse: 'BMVN_HCM_TT' },
@@ -43,7 +43,7 @@ const EMPLOYEES_PER_WAREHOUSE = [
   { staff_id: 'NV108', staff_name: 'Ngô Thị Zara', role: 'Packer', warehouse: 'BMVN_HCM_TT' },
   { staff_id: 'NV109', staff_name: 'Bùi Văn Anh', role: 'Handover Staff', warehouse: 'BMVN_HCM_TT' },
   { staff_id: 'NV110', staff_name: 'Đặng Thị Bảo', role: 'Picker', warehouse: 'BMVN_HCM_TT' },
-  
+
   // BMVN_HN_LB - 8 employees
   { staff_id: 'NV201', staff_name: 'Lý Văn Cao', role: 'Packer', warehouse: 'BMVN_HN_LB' },
   { staff_id: 'NV202', staff_name: 'Mai Thị Diệu', role: 'Picker', warehouse: 'BMVN_HN_LB' },
@@ -123,7 +123,7 @@ function getWeekDates(yearWeek: string): { start: string, end: string } {
   weekStart.setDate(jan4.getDate() - dayOfWeek + 1 + (week - 1) * 7)
   const weekEnd = new Date(weekStart)
   weekEnd.setDate(weekStart.getDate() + 6)
-  
+
   return {
     start: weekStart.toISOString().split('T')[0],
     end: weekEnd.toISOString().split('T')[0]
@@ -134,17 +134,17 @@ function getWeekDates(yearWeek: string): { start: string, end: string } {
 seed.post('/generate', async (c) => {
   const supabase = createSupabaseClient()
   const results: Record<string, any> = {}
-  
+
   try {
     // Get parameters
     const body = await c.req.json().catch(() => ({}))
     const payrollPeriod = body.payrollPeriod || '2026-01'
     const weeksToGenerate = body.weeks || 4 // Generate 4 weeks of data
-    
+
     // Calculate year weeks for the month
     const [year, month] = payrollPeriod.split('-').map(Number)
     const yearWeeks: string[] = []
-    
+
     // Get ISO weeks that fall in this month
     for (let day = 1; day <= 28; day += 7) {
       const date = new Date(year, month - 1, day)
@@ -154,7 +154,7 @@ seed.post('/generate', async (c) => {
         yearWeeks.push(yw)
       }
     }
-    
+
     // Ensure we have exactly weeksToGenerate weeks
     while (yearWeeks.length < weeksToGenerate) {
       const lastWeek = yearWeeks[yearWeeks.length - 1]
@@ -162,44 +162,44 @@ seed.post('/generate', async (c) => {
       yearWeeks.push(`${y}-W${String(w + 1).padStart(2, '0')}`)
     }
     yearWeeks.splice(weeksToGenerate)
-    
+
     console.log('Generating data for weeks:', yearWeeks)
     results.yearWeeks = yearWeeks
-    
+
     // 1. Generate KPI Weekly Summary for each employee, each week
     const kpiWeeklySummaries: any[] = []
     const rankingWeeklyResults: any[] = []
-    
+
     for (const employee of EMPLOYEES_PER_WAREHOUSE) {
       const mainTask = getMainTaskFromRole(employee.role)
       const warehouse = WAREHOUSES.find(w => w.code === employee.warehouse)!
-      
+
       for (const yearWeek of yearWeeks) {
         const weekDates = getWeekDates(yearWeek)
-        
+
         // Generate realistic data with some variation
         const workHours = randomFloat(32, 48, 1)
         const workDays = randomInt(5, 6)
-        
+
         // Performance varies by "skill level" - use staff_id to create consistent performance
         const basePerformance = (parseInt(employee.staff_id.replace(/\D/g, '')) % 30) + 30 // 30-60 range
         const mainTaskPoints = Math.round(workHours * basePerformance * randomFloat(0.85, 1.15, 2))
         const pph = Math.round((mainTaskPoints / workHours) * 100) / 100
-        
+
         // Task breakdown
         const taskPointsDetail: Record<string, { points: number, quantity: number }> = {
           [mainTask]: { points: mainTaskPoints, quantity: randomInt(150, 400) }
         }
-        
+
         // Add some secondary tasks randomly
         if (Math.random() > 0.5) {
           const secondaryTasks = ['packing', 'picking', 'handover'].filter(t => t !== mainTask)
           const secondary = secondaryTasks[randomInt(0, secondaryTasks.length - 1)]
           taskPointsDetail[secondary] = { points: randomInt(50, 200), quantity: randomInt(20, 60) }
         }
-        
+
         const totalPoints = Object.values(taskPointsDetail).reduce((sum, t) => sum + t.points, 0)
-        
+
         kpiWeeklySummaries.push({
           warehouse_code: employee.warehouse,
           warehouse_name: warehouse.name,
@@ -221,7 +221,7 @@ seed.post('/generate', async (c) => {
           pph: pph,
           data_status: workHours >= 20 ? 'OK' : 'INSUFFICIENT_HOURS',
         })
-        
+
         // Generate ranking result
         const rankingScore = getRankingScore(pph)
         rankingWeeklyResults.push({
@@ -239,46 +239,46 @@ seed.post('/generate', async (c) => {
         })
       }
     }
-    
+
     // Insert KPI Weekly Summaries
     console.log('Inserting', kpiWeeklySummaries.length, 'KPI weekly summaries...')
     const { data: weeklyData, error: weeklyError } = await supabase
       .from('kpi_weekly_summary')
       .upsert(kpiWeeklySummaries, { onConflict: 'warehouse_code,staff_id,year_week' })
       .select('id')
-    
+
     if (weeklyError) {
       console.error('Weekly summary error:', weeklyError)
       results.kpi_weekly_summary = { error: weeklyError.message }
     } else {
       results.kpi_weekly_summary = { inserted: kpiWeeklySummaries.length }
     }
-    
+
     // Insert Ranking Weekly Results
     console.log('Inserting', rankingWeeklyResults.length, 'ranking results...')
     const { data: rankingData, error: rankingError } = await supabase
       .from('ranking_weekly_result')
       .upsert(rankingWeeklyResults, { onConflict: 'warehouse_code,staff_id,year_week' })
       .select('id')
-    
+
     if (rankingError) {
       console.error('Ranking error:', rankingError)
       results.ranking_weekly_result = { error: rankingError.message }
     } else {
       results.ranking_weekly_result = { inserted: rankingWeeklyResults.length }
     }
-    
+
     // 2. Generate ORS Events (some employees have violations)
     const orsEvents: any[] = []
     const violatingEmployees = EMPLOYEES_PER_WAREHOUSE.filter(() => Math.random() > 0.6) // 40% have ORS
-    
+
     for (const employee of violatingEmployees) {
       const numEvents = randomInt(1, 4) // 1-4 events per employee
-      
+
       for (let i = 0; i < numEvents; i++) {
         const ors = ORS_CODES[randomInt(0, ORS_CODES.length - 1)]
         const eventDay = randomInt(1, 28)
-        
+
         orsEvents.push({
           warehouse_code: employee.warehouse,
           staff_id: employee.staff_id,
@@ -296,22 +296,22 @@ seed.post('/generate', async (c) => {
         })
       }
     }
-    
+
     console.log('Inserting', orsEvents.length, 'ORS events...')
     const { error: orsError } = await supabase
       .from('ors_event')
       .insert(orsEvents)
-    
+
     if (orsError) {
       console.error('ORS error:', orsError)
       results.ors_event = { error: orsError.message }
     } else {
       results.ors_event = { inserted: orsEvents.length }
     }
-    
+
     // 3. Generate ORS Monthly Summary
     const orsMonthlySummaries: any[] = []
-    
+
     // Group ORS events by employee
     const orsGrouped: Record<string, any[]> = {}
     for (const event of orsEvents.filter(e => e.status === 'CONFIRMED')) {
@@ -319,13 +319,13 @@ seed.post('/generate', async (c) => {
       if (!orsGrouped[key]) orsGrouped[key] = []
       orsGrouped[key].push(event)
     }
-    
+
     for (const employee of EMPLOYEES_PER_WAREHOUSE) {
       const key = `${employee.warehouse}-${employee.staff_id}`
       const events = orsGrouped[key] || []
       const totalPoints = events.reduce((sum, e) => sum + e.ors_points, 0)
       const milestone = getMilestoneLevel(totalPoints)
-      
+
       orsMonthlySummaries.push({
         warehouse_code: employee.warehouse,
         staff_id: employee.staff_id,
@@ -338,23 +338,23 @@ seed.post('/generate', async (c) => {
         penalty_rate: getPenaltyRate(milestone),
       })
     }
-    
+
     console.log('Inserting', orsMonthlySummaries.length, 'ORS monthly summaries...')
     const { error: orsMonthlyError } = await supabase
       .from('ors_monthly_summary')
       .upsert(orsMonthlySummaries, { onConflict: 'warehouse_code,staff_id,payroll_period' })
-    
+
     if (orsMonthlyError) {
       console.error('ORS monthly error:', orsMonthlyError)
       results.ors_monthly_summary = { error: orsMonthlyError.message }
     } else {
       results.ors_monthly_summary = { inserted: orsMonthlySummaries.length }
     }
-    
+
     // 4. Generate KPI Monthly Summary
     const kpiMonthlySummaries: any[] = []
     const payrollBridgeData: any[] = []
-    
+
     // Group weekly data by employee
     const weeklyGrouped: Record<string, any[]> = {}
     for (const weekly of kpiWeeklySummaries) {
@@ -362,21 +362,21 @@ seed.post('/generate', async (c) => {
       if (!weeklyGrouped[key]) weeklyGrouped[key] = []
       weeklyGrouped[key].push(weekly)
     }
-    
+
     for (const employee of EMPLOYEES_PER_WAREHOUSE) {
       const key = `${employee.warehouse}-${employee.staff_id}`
       const weeklies = weeklyGrouped[key] || []
       const orsSummary = orsMonthlySummaries.find(o => o.warehouse_code === employee.warehouse && o.staff_id === employee.staff_id)
       const warehouse = WAREHOUSES.find(w => w.code === employee.warehouse)!
-      
+
       if (weeklies.length === 0) continue
-      
+
       // Calculate monthly aggregates
       const majorKpi = weeklies.reduce((sum, w) => sum + w.main_task_points, 0)
       const totalKpiPoints = weeklies.reduce((sum, w) => sum + w.total_points, 0)
       const totalWorkHours = weeklies.reduce((sum, w) => sum + w.estimated_work_hours, 0)
       const workDays = weeklies.reduce((sum, w) => sum + w.working_days, 0)
-      
+
       // Weekly rankings
       const weeklyRankings = weeklies.map(w => ({
         week: w.year_week,
@@ -384,11 +384,11 @@ seed.post('/generate', async (c) => {
         pph: w.pph,
         score: getRankingScore(w.pph)
       }))
-      
+
       const avgRankingScore = weeklyRankings.reduce((sum, r) => sum + r.score, 0) / weeklyRankings.length
       const finalRankingScore = Math.round(avgRankingScore)
       const ratingFactor = getRatingFactor(finalRankingScore)
-      
+
       // Task points monthly
       const taskPointsMonthly: Record<string, number> = {}
       for (const w of weeklies) {
@@ -396,16 +396,16 @@ seed.post('/generate', async (c) => {
           taskPointsMonthly[task] = (taskPointsMonthly[task] || 0) + detail.points
         }
       }
-      
+
       // ORS data
       const orsPointsTotal = orsSummary?.ors_points_total || 0
       const orsPenaltyRate = orsSummary?.penalty_rate || 0
-      
+
       // Calculate bonus (1000 VND per point for VN)
       const amountPerPoint = 1000
       const kpiBonusCalculated = Math.round(majorKpi * amountPerPoint * ratingFactor)
       const kpiBonusFinal = Math.round(kpiBonusCalculated * (1 - orsPenaltyRate))
-      
+
       kpiMonthlySummaries.push({
         warehouse_code: employee.warehouse,
         warehouse_name: warehouse.name,
@@ -428,7 +428,7 @@ seed.post('/generate', async (c) => {
         work_hours: totalWorkHours,
         status: 'CALCULATED',
       })
-      
+
       // Payroll bridge
       payrollBridgeData.push({
         warehouse_code: employee.warehouse,
@@ -443,31 +443,31 @@ seed.post('/generate', async (c) => {
         applied_to_payroll: false,
       })
     }
-    
+
     console.log('Inserting', kpiMonthlySummaries.length, 'KPI monthly summaries...')
     const { error: monthlyError } = await supabase
       .from('kpi_monthly_summary')
       .upsert(kpiMonthlySummaries, { onConflict: 'warehouse_code,staff_id,payroll_period' })
-    
+
     if (monthlyError) {
       console.error('Monthly error:', monthlyError)
       results.kpi_monthly_summary = { error: monthlyError.message }
     } else {
       results.kpi_monthly_summary = { inserted: kpiMonthlySummaries.length }
     }
-    
+
     console.log('Inserting', payrollBridgeData.length, 'payroll bridge records...')
     const { error: bridgeError } = await supabase
       .from('payroll_kpi_bridge')
       .upsert(payrollBridgeData, { onConflict: 'warehouse_code,payroll_period,staff_id' })
-    
+
     if (bridgeError) {
       console.error('Bridge error:', bridgeError)
       results.payroll_kpi_bridge = { error: bridgeError.message }
     } else {
       results.payroll_kpi_bridge = { inserted: payrollBridgeData.length }
     }
-    
+
     return c.json({
       success: true,
       message: 'Sample data generated successfully',
@@ -476,7 +476,7 @@ seed.post('/generate', async (c) => {
       warehouses: WAREHOUSES.length,
       results,
     })
-    
+
   } catch (error: any) {
     console.error('Seed error:', error)
     return c.json({
@@ -491,7 +491,7 @@ seed.post('/generate', async (c) => {
 seed.post('/clear', async (c) => {
   const supabase = createSupabaseClient()
   const results: Record<string, any> = {}
-  
+
   try {
     // Clear in reverse dependency order
     const tables = [
@@ -502,26 +502,26 @@ seed.post('/clear', async (c) => {
       'ranking_weekly_result',
       'kpi_weekly_summary',
     ]
-    
+
     for (const table of tables) {
       const { error } = await supabase
         .from(table)
         .delete()
         .neq('id', 0) // Delete all
-      
+
       if (error) {
         results[table] = { error: error.message }
       } else {
         results[table] = { cleared: true }
       }
     }
-    
+
     return c.json({
       success: true,
       message: 'All generated data cleared',
       results,
     })
-    
+
   } catch (error: any) {
     return c.json({
       success: false,
@@ -535,7 +535,7 @@ seed.post('/clear', async (c) => {
 seed.get('/stats', async (c) => {
   const supabase = createSupabaseClient()
   const stats: Record<string, any> = {}
-  
+
   const tables = [
     'kpi_weekly_summary',
     'ranking_weekly_result',
@@ -544,15 +544,15 @@ seed.get('/stats', async (c) => {
     'kpi_monthly_summary',
     'payroll_kpi_bridge',
   ]
-  
+
   for (const table of tables) {
     const { count, error } = await supabase
       .from(table)
       .select('*', { count: 'exact', head: true })
-    
+
     stats[table] = error ? { error: error.message } : { count }
   }
-  
+
   return c.json({ success: true, stats })
 })
 
@@ -561,7 +561,7 @@ seed.get('/preview', async (c) => {
   const supabase = createSupabaseClient()
   const table = c.req.query('table') || 'kpi_weekly_summary'
   const limit = parseInt(c.req.query('limit') || '10')
-  
+
   const validTables = [
     'kpi_weekly_summary',
     'ranking_weekly_result',
@@ -570,26 +570,26 @@ seed.get('/preview', async (c) => {
     'kpi_monthly_summary',
     'payroll_kpi_bridge',
   ]
-  
+
   if (!validTables.includes(table)) {
     return c.json({ success: false, error: 'Invalid table name' }, 400)
   }
-  
+
   try {
     // Get count
     const { count } = await supabase
       .from(table)
       .select('*', { count: 'exact', head: true })
-    
+
     // Get data (limited columns for readability)
     let query = supabase.from(table).select('*').limit(limit).order('id', { ascending: false })
-    
+
     const { data, error } = await query
-    
+
     if (error) {
       return c.json({ success: false, error: error.message }, 400)
     }
-    
+
     return c.json({ success: true, table, total: count, data })
   } catch (error: any) {
     return c.json({ success: false, error: error.message }, 500)
@@ -600,7 +600,7 @@ seed.get('/preview', async (c) => {
 seed.post('/reset', async (c) => {
   const supabase = createSupabaseClient()
   const results: Record<string, any> = {}
-  
+
   try {
     // Clear in reverse dependency order
     const tables = [
@@ -611,26 +611,26 @@ seed.post('/reset', async (c) => {
       'ranking_weekly_result',
       'kpi_weekly_summary',
     ]
-    
+
     for (const table of tables) {
       const { error } = await supabase
         .from(table)
         .delete()
         .neq('id', 0) // Delete all
-      
+
       if (error) {
         results[table] = { error: error.message }
       } else {
         results[table] = { cleared: true }
       }
     }
-    
+
     return c.json({
       success: true,
       message: 'All sample data has been reset',
       results,
     })
-    
+
   } catch (error: any) {
     return c.json({
       success: false,

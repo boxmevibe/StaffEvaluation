@@ -46,7 +46,7 @@ export const OnboardingPage: FC = () => {
               <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <i class="fas fa-rocket text-blue-600 text-3xl"></i>
               </div>
-              <h2 class="text-2xl font-bold text-gray-900 mb-2">Chào mừng đến với KPI Warehouse!</h2>
+              <h2 class="text-2xl font-bold text-gray-900 mb-2">Chào mừng đến với Performance!</h2>
               <p class="text-gray-600">Hệ thống đánh giá năng suất công bằng và minh bạch</p>
             </div>
 
@@ -139,7 +139,7 @@ export const OnboardingPage: FC = () => {
                 </h3>
                 <div class="bg-blue-50 rounded-xl p-6 mb-4">
                   <p class="text-blue-900 mb-3">
-                    <strong>PPH = Points Per Hour</strong><br/>
+                    <strong>PPH = Points Per Hour</strong><br />
                     Số điểm sản lượng trung bình mỗi giờ làm việc
                   </p>
                   <div class="bg-white rounded-lg p-3 border border-blue-200">
@@ -177,7 +177,7 @@ export const OnboardingPage: FC = () => {
                 </h3>
                 <div class="bg-purple-50 rounded-xl p-6 mb-4">
                   <p class="text-purple-900 mb-3">
-                    <strong>Ranking = Xếp hạng năng suất</strong><br/>
+                    <strong>Ranking = Xếp hạng năng suất</strong><br />
                     Được tính từ PPH, quyết định hệ số thưởng
                   </p>
                 </div>
@@ -269,7 +269,7 @@ export const OnboardingPage: FC = () => {
                 ⚠️ ORS là gì?
               </h3>
               <p class="text-red-800">
-                <strong>ORS = Operational Risk Score</strong><br/>
+                <strong>ORS = Operational Risk Score</strong><br />
                 Điểm ghi nhận các vi phạm, sai sót trong công việc. ORS càng cao = Bonus bị trừ càng nhiều.
               </p>
             </div>
@@ -702,7 +702,8 @@ export const OnboardingPage: FC = () => {
         </div>
       </div>
 
-      <script dangerouslySetInnerHTML={{ __html: `
+      <script dangerouslySetInnerHTML={{
+        __html: `
         let completedSteps = JSON.parse(localStorage.getItem('onboarding_completed') || '[]');
         
         function showStep(step) {

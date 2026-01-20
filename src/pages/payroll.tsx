@@ -6,163 +6,185 @@ export const PayrollPage: FC = () => {
   const warehouses = Object.entries(WAREHOUSES)
 
   return (
-    <Layout title="Payroll KPI Data" activeTab="payroll">
+    <Layout title="Payroll" activeTab="payroll">
+      {/* Page Header */}
+      <div class="mb-4">
+        <p class="text-sm text-gray-500">Xem và áp dụng dữ liệu thưởng KPI cho kỳ lương.</p>
+      </div>
       {/* Filter Section */}
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-        <div class="grid md:grid-cols-4 gap-4">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Warehouse</label>
-            <select 
-              id="warehouseCode" 
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+            <label class="block text-sm font-medium text-gray-700 mb-1">Kho</label>
+            <select
+              id="warehouseCode"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px] focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">-- Tất cả kho --</option>
+              <option value="">Tất cả kho</option>
               {warehouses.map(([code, info]) => (
-                <option value={code}>{code} - {info.name}</option>
+                <option value={code}>{code} – {info.name}</option>
               ))}
             </select>
+            <p class="text-xs text-gray-400 mt-1">Để trống = tất cả kho</p>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Kỳ lương *</label>
-            <input 
-              type="month" 
-              id="payrollPeriod" 
+            <input
+              type="month"
+              id="payrollPeriod"
               required
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px] focus:ring-2 focus:ring-blue-500"
             />
+            <p class="text-xs text-gray-400 mt-1">Tháng tính thưởng KPI</p>
+            <p id="error-period" class="text-xs text-red-500 mt-1 hidden">Vui lòng chọn kỳ lương.</p>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
-            <select id="applyFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            <select id="applyFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px] focus:ring-2 focus:ring-blue-500">
               <option value="">Tất cả</option>
-              <option value="false">Chưa apply</option>
-              <option value="true">Đã apply</option>
+              <option value="false">Chưa áp dụng</option>
+              <option value="true">Đã áp dụng</option>
             </select>
           </div>
           <div class="flex items-end">
-            <button 
+            <button
+              id="btn-load-payroll"
               onclick="loadPayrollData()"
-              class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700"
+              class="w-full bg-blue-600 text-white px-4 py-2.5 min-h-[44px] rounded-lg font-medium hover:bg-blue-700"
             >
-              <i class="fas fa-search mr-2"></i>
+              <i class="fas fa-download mr-2"></i>
               Tải dữ liệu
             </button>
           </div>
         </div>
+        <p id="error-general" class="text-sm text-red-500 mt-3 p-3 bg-red-50 rounded-lg hidden"></p>
       </div>
 
       {/* Stats Overview */}
-      <div class="grid md:grid-cols-4 gap-6 mb-6">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-500">Tổng nhân viên</p>
-              <p class="text-3xl font-bold text-gray-900 mt-1" id="stat-total">--</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-4">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <p class="text-xs md:text-sm font-medium text-gray-500">Tổng nhân viên</p>
+              <p class="text-2xl md:text-3xl font-bold text-gray-900 mt-1" id="stat-total">--</p>
+              <p class="text-xs text-gray-400 mt-1 hidden md:block">Có dữ liệu thưởng KPI</p>
             </div>
-            <div class="bg-blue-500 p-4 rounded-xl">
-              <i class="fas fa-users text-white text-2xl"></i>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-500">Tổng KPI Bonus</p>
-              <p class="text-2xl font-bold text-green-600 mt-1" id="stat-total-bonus">--</p>
-            </div>
-            <div class="bg-green-500 p-4 rounded-xl">
-              <i class="fas fa-money-bill-wave text-white text-2xl"></i>
+            <div class="bg-blue-500 p-3 md:p-4 rounded-xl flex-shrink-0">
+              <i class="fas fa-users text-white text-lg md:text-2xl"></i>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-500">Đã Apply</p>
-              <p class="text-3xl font-bold text-purple-600 mt-1" id="stat-applied">--</p>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <p class="text-xs md:text-sm font-medium text-gray-500">Tổng thưởng KPI</p>
+              <p class="text-lg md:text-2xl font-bold text-green-600 mt-1" id="stat-total-bonus">--</p>
+              <p class="text-xs text-gray-400 mt-1 hidden md:block">Toàn bộ kho/bộ lọc</p>
             </div>
-            <div class="bg-purple-500 p-4 rounded-xl">
-              <i class="fas fa-check-double text-white text-2xl"></i>
+            <div class="bg-green-500 p-3 md:p-4 rounded-xl flex-shrink-0">
+              <i class="fas fa-money-bill-wave text-white text-lg md:text-2xl"></i>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-500">Chưa Apply</p>
-              <p class="text-3xl font-bold text-orange-600 mt-1" id="stat-pending">--</p>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <p class="text-xs md:text-sm font-medium text-gray-500">Đã áp dụng</p>
+              <p class="text-2xl md:text-3xl font-bold text-purple-600 mt-1" id="stat-applied">--</p>
+              <p class="text-xs text-gray-400 mt-1 hidden md:block">Vào bảng lương</p>
             </div>
-            <div class="bg-orange-500 p-4 rounded-xl">
-              <i class="fas fa-clock text-white text-2xl"></i>
+            <div class="bg-purple-500 p-3 md:p-4 rounded-xl flex-shrink-0">
+              <i class="fas fa-check-double text-white text-lg md:text-2xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <p class="text-xs md:text-sm font-medium text-gray-500">Chưa áp dụng</p>
+              <p class="text-2xl md:text-3xl font-bold text-orange-600 mt-1" id="stat-pending">--</p>
+              <p class="text-xs text-gray-400 mt-1 hidden md:block">Cần xử lý</p>
+            </div>
+            <div class="bg-orange-500 p-3 md:p-4 rounded-xl flex-shrink-0">
+              <i class="fas fa-clock text-white text-lg md:text-2xl"></i>
             </div>
           </div>
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
-        <div class="flex flex-wrap gap-4 items-center justify-between">
-          <div class="flex gap-2">
-            <button onclick="selectAll()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200">
-              <i class="fas fa-check-square mr-2"></i>Chọn tất cả
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-3 md:p-4 mb-4">
+        <div class="flex flex-col md:flex-row gap-3 md:gap-4 items-stretch md:items-center justify-between">
+          <div class="flex flex-wrap gap-2">
+            <button onclick="selectAll()" class="flex-1 md:flex-none bg-gray-100 text-gray-700 px-3 py-2 min-h-[44px] rounded-lg hover:bg-gray-200 text-sm">
+              <i class="fas fa-check-square mr-1"></i>Chọn tất cả
             </button>
-            <button onclick="deselectAll()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200">
-              <i class="fas fa-square mr-2"></i>Bỏ chọn
+            <button onclick="deselectAll()" class="flex-1 md:flex-none bg-gray-100 text-gray-700 px-3 py-2 min-h-[44px] rounded-lg hover:bg-gray-200 text-sm">
+              <i class="fas fa-square mr-1"></i>Bỏ chọn
             </button>
-            <button onclick="exportCSV()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200">
-              <i class="fas fa-download mr-2"></i>Export CSV
+            <button onclick="exportCSV()" class="flex-1 md:flex-none bg-gray-100 text-gray-700 px-3 py-2 min-h-[44px] rounded-lg hover:bg-gray-200 text-sm">
+              <i class="fas fa-download mr-1"></i>Xuất file CSV
             </button>
           </div>
-          <div class="flex gap-2">
-            <button onclick="applySelected()" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">
-              <i class="fas fa-check mr-2"></i>Apply Selected to Payroll
+          <div>
+            <button id="btn-apply" onclick="applySelected()" class="w-full md:w-auto bg-green-600 text-white px-4 py-2.5 min-h-[44px] rounded-lg hover:bg-green-700 font-medium">
+              <i class="fas fa-check mr-2"></i>Áp dụng vào bảng lương
             </button>
           </div>
         </div>
+        <p class="text-xs text-gray-400 mt-2 hidden md:block">Chỉ áp dụng cho các nhân viên bạn đã chọn.</p>
       </div>
 
-      {/* Data Table */}
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      {/* Data Table - Desktop */}
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hidden md:block">
         <div class="overflow-x-auto">
-          <table class="w-full">
+          <table class="w-full min-w-[800px]">
             <thead class="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th class="px-4 py-3 text-left">
                   <input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll()" class="rounded" />
                 </th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Warehouse</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Staff ID</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Major KPI</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rating Factor</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">KPI Bonus</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Penalty</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Version</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Calculated At</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kho</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mã NV</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Điểm KPI</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hệ số</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Thưởng KPI</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tiền trừ</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phiên bản</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tính lúc</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trạng thái</th>
               </tr>
             </thead>
             <tbody id="payroll-data-body" class="divide-y divide-gray-200">
-              <tr><td colspan="10" class="px-4 py-8 text-center text-gray-500">Chọn kỳ lương và click "Tải dữ liệu"</td></tr>
+              <tr><td colspan={10} class="px-4 py-8 text-center text-gray-500">Chọn kỳ lương rồi bấm "Tải dữ liệu"</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Summary by Warehouse */}
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">
-          <i class="fas fa-chart-bar text-blue-600 mr-2"></i>
-          Tổng hợp theo Warehouse
-        </h3>
-        <div id="warehouse-summary" class="grid md:grid-cols-3 lg:grid-cols-4 gap-4">
-          <p class="text-gray-500 col-span-full text-center py-4">Chưa có dữ liệu</p>
+      {/* Data Cards - Mobile */}
+      <div id="payroll-cards-mobile" class="md:hidden space-y-3">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center text-gray-500">
+          Chọn kỳ lương rồi bấm "Tải dữ liệu"
         </div>
       </div>
 
-      <script dangerouslySetInnerHTML={{ __html: `
+      {/* Summary by Warehouse */}
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 mt-4">
+        <h3 class="text-base md:text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <i class="fas fa-chart-bar text-blue-600"></i>
+          Tổng hợp thưởng KPI theo kho
+        </h3>
+        <div id="warehouse-summary" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+          <p class="text-gray-500 col-span-full text-center py-4 text-sm">Chọn kỳ lương và tải dữ liệu để xem tổng hợp.</p>
+        </div>
+      </div>
+
+      <script dangerouslySetInnerHTML={{
+        __html: `
         // Using window.window.API_BASE from Layout;
         let payrollData = [];
 
@@ -171,12 +193,16 @@ export const PayrollPage: FC = () => {
         document.getElementById('payrollPeriod').value = now.toISOString().slice(0, 7);
 
         async function loadPayrollData() {
+          // Clear previous errors
+          document.getElementById('error-period')?.classList.add('hidden');
+          document.getElementById('error-general')?.classList.add('hidden');
+          
           const warehouseCode = document.getElementById('warehouseCode').value;
           const payrollPeriod = document.getElementById('payrollPeriod').value;
           const applyFilter = document.getElementById('applyFilter').value;
 
           if (!payrollPeriod) {
-            alert('Vui lòng chọn kỳ lương');
+            document.getElementById('error-period').classList.remove('hidden');
             return;
           }
 
@@ -204,15 +230,18 @@ export const PayrollPage: FC = () => {
             document.getElementById('stat-applied').textContent = applied;
             document.getElementById('stat-pending').textContent = pending;
 
-            // Render table
+            // Render table and mobile cards
             renderTable(filteredData);
+            renderMobileCards(filteredData);
 
             // Warehouse summary
             renderWarehouseSummary(payrollData);
 
           } catch (error) {
             console.error('Error loading payroll data:', error);
-            alert('Không thể tải dữ liệu: ' + error.message);
+            const errorEl = document.getElementById('error-general');
+            errorEl.textContent = 'Không tải được dữ liệu Payroll. Vui lòng kiểm tra kết nối hoặc thử lại.';
+            errorEl.classList.remove('hidden');
           }
         }
 
@@ -232,12 +261,39 @@ export const PayrollPage: FC = () => {
               <td class="px-4 py-3 text-sm text-gray-500">\${d.calculated_at ? new Date(d.calculated_at).toLocaleString('vi-VN') : '-'}</td>
               <td class="px-4 py-3">
                 \${d.applied_to_payroll 
-                  ? '<span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Applied</span>'
-                  : '<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Pending</span>'
+                  ? '<span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-bold">Đã áp dụng</span>'
+                  : '<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-bold">Chưa áp dụng</span>'
                 }
               </td>
             </tr>
-          \`).join('') || '<tr><td colspan="10" class="px-4 py-8 text-center text-gray-500">Không có dữ liệu</td></tr>';
+          \`).join('') || '<tr><td colspan="10" class="px-4 py-8 text-center text-gray-500">Không tìm thấy dữ liệu thưởng KPI cho kỳ lương và bộ lọc bạn đã chọn.</td></tr>';
+        }
+
+        function renderMobileCards(data) {
+          document.getElementById('payroll-cards-mobile').innerHTML = data.map(d => \`
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <input type="checkbox" class="row-checkbox rounded w-5 h-5" data-staff-id="\${d.staff_id}" \${d.applied_to_payroll ? 'disabled' : ''} />
+                  <div>
+                    <p class="font-bold text-gray-900">\${d.staff_id}</p>
+                    <p class="text-xs text-gray-500">\${d.warehouse_code}</p>
+                  </div>
+                </div>
+                \${d.applied_to_payroll 
+                  ? '<span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-bold">Đã áp dụng</span>'
+                  : '<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-bold">Chưa áp dụng</span>'
+                }
+              </div>
+              <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
+                <div><span class="text-gray-500">Điểm KPI:</span> <span class="font-medium">\${d.major_kpi?.toLocaleString() || 0}</span></div>
+                <div><span class="text-gray-500">Hệ số:</span> <span class="font-medium">\${d.rating_factor?.toFixed(2) || 0}</span></div>
+                <div><span class="text-gray-500">Thưởng:</span> <span class="font-bold text-green-600">\${d.kpi_bonus?.toLocaleString() || 0}</span></div>
+                <div><span class="text-gray-500">Trừ:</span> <span class="text-red-600">\${d.penalty?.toLocaleString() || 0}</span></div>
+              </div>
+              <p class="text-xs text-gray-400 mt-2">Tính lúc: \${d.calculated_at ? new Date(d.calculated_at).toLocaleString('vi-VN') : '-'}</p>
+            </div>
+          \`).join('') || '<div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center text-gray-500">Không tìm thấy dữ liệu.</div>';
         }
 
         function renderWarehouseSummary(data) {
@@ -252,15 +308,15 @@ export const PayrollPage: FC = () => {
           });
 
           document.getElementById('warehouse-summary').innerHTML = Object.entries(summary).map(([code, s]) => \`
-            <div class="p-4 bg-gray-50 rounded-lg">
-              <h4 class="font-medium text-gray-900 mb-2">\${code}</h4>
-              <div class="text-sm space-y-1">
+            <div class="p-3 md:p-4 bg-gray-50 rounded-lg border border-gray-100">
+              <h4 class="font-bold text-gray-900 mb-2 text-sm">\${code}</h4>
+              <div class="text-xs md:text-sm space-y-1">
                 <p><span class="text-gray-500">Nhân viên:</span> <span class="font-medium">\${s.count}</span></p>
-                <p><span class="text-gray-500">Tổng bonus:</span> <span class="font-medium text-green-600">\${s.totalBonus.toLocaleString()}</span></p>
-                <p><span class="text-gray-500">Đã apply:</span> <span class="font-medium">\${s.applied}/\${s.count}</span></p>
+                <p><span class="text-gray-500">Tổng thưởng:</span> <span class="font-bold text-green-600">\${s.totalBonus.toLocaleString()}</span></p>
+                <p><span class="text-gray-500">Đã áp dụng:</span> <span class="font-medium">\${s.applied}/\${s.count}</span></p>
               </div>
             </div>
-          \`).join('') || '<p class="text-gray-500 col-span-full text-center py-4">Không có dữ liệu</p>';
+          \`).join('') || '<p class="text-gray-500 col-span-full text-center py-4 text-sm">Không có dữ liệu</p>';
         }
 
         function toggleSelectAll() {
@@ -288,31 +344,57 @@ export const PayrollPage: FC = () => {
           });
 
           if (selectedIds.length === 0) {
-            alert('Vui lòng chọn ít nhất một nhân viên');
+            const errorEl = document.getElementById('error-general');
+            errorEl.textContent = 'Bạn chưa chọn nhân viên nào. Vui lòng chọn trước khi áp dụng.';
+            errorEl.className = 'text-sm text-red-500 mt-3 p-3 bg-red-50 rounded-lg';
+            errorEl.classList.remove('hidden');
             return;
           }
 
-          if (!confirm('Bạn có chắc muốn apply ' + selectedIds.length + ' records vào payroll?')) {
+          const periodDisplay = payrollPeriod.split('-').reverse().join('/');
+          if (!confirm('Bạn chuẩn bị áp dụng thưởng KPI cho ' + selectedIds.length + ' nhân viên trong kỳ lương ' + periodDisplay + '.\n\nThao tác này sẽ cập nhật dữ liệu vào hệ thống lương. Bạn chắc chứ?')) {
             return;
           }
 
           try {
+            const btn = document.getElementById('btn-apply');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Đang áp dụng...';
+            
             const res = await axios.post(window.API_BASE + '/payroll/apply', {
               warehouseCode: warehouseCode || undefined,
               payrollPeriod,
               staffIds: selectedIds
             });
 
-            alert('Đã apply ' + res.data.updated + ' records thành công!');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check mr-2"></i>Áp dụng vào bảng lương';
+            
+            // Show success message
+            const errorEl = document.getElementById('error-general');
+            errorEl.textContent = 'Đã áp dụng thưởng KPI cho ' + res.data.updated + ' nhân viên thành công!';
+            errorEl.className = 'text-sm text-green-600 mt-3 p-3 bg-green-50 rounded-lg';
+            errorEl.classList.remove('hidden');
+            
             loadPayrollData();
           } catch (error) {
-            alert('Lỗi: ' + (error.response?.data?.error || error.message));
+            const btn = document.getElementById('btn-apply');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check mr-2"></i>Áp dụng vào bảng lương';
+            
+            const errorEl = document.getElementById('error-general');
+            errorEl.textContent = 'Lỗi: ' + (error.response?.data?.error || error.message);
+            errorEl.className = 'text-sm text-red-500 mt-3 p-3 bg-red-50 rounded-lg';
+            errorEl.classList.remove('hidden');
           }
         }
 
         function exportCSV() {
           if (payrollData.length === 0) {
-            alert('Không có dữ liệu để export');
+            const errorEl = document.getElementById('error-general');
+            errorEl.textContent = 'Không có dữ liệu để xuất. Vui lòng tải dữ liệu trước.';
+            errorEl.className = 'text-sm text-red-500 mt-3 p-3 bg-red-50 rounded-lg';
+            errorEl.classList.remove('hidden');
             return;
           }
 

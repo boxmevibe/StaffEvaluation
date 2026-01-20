@@ -1,4 +1,4 @@
-// Database Types for KPI Warehouse Management System
+// Database Types for Perfomance Management System
 
 export interface Database {
   public: {
@@ -381,30 +381,30 @@ export interface PayrollKpiBridge {
 }
 
 // ==================== ENUMS & SUPPORTING TYPES ====================
-export type MainTaskType = 
-  | 'packing' 
-  | 'picking' 
-  | 'handover' 
-  | 'putaway' 
-  | 'inspection' 
-  | 'co_inspection' 
-  | 'data_entry' 
-  | 'unloading' 
-  | 'move' 
-  | 'cycle_count' 
+export type MainTaskType =
+  | 'packing'
+  | 'picking'
+  | 'handover'
+  | 'putaway'
+  | 'inspection'
+  | 'co_inspection'
+  | 'data_entry'
+  | 'unloading'
+  | 'move'
+  | 'cycle_count'
   | 'relabel'
 
-export type JobGroup = 
-  | 'packing' 
-  | 'picking' 
-  | 'handover' 
-  | 'putaway' 
-  | 'inspection' 
-  | 'co_inspection' 
-  | 'data_entry' 
-  | 'unloading' 
-  | 'move' 
-  | 'cycle_count' 
+export type JobGroup =
+  | 'packing'
+  | 'picking'
+  | 'handover'
+  | 'putaway'
+  | 'inspection'
+  | 'co_inspection'
+  | 'data_entry'
+  | 'unloading'
+  | 'move'
+  | 'cycle_count'
   | 'relabel'
 
 export type SeverityLevel = 'S1' | 'S2' | 'S3' | 'S4' | 'S5'

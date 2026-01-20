@@ -1,29 +1,155 @@
 import { jsxRenderer } from 'hono/jsx-renderer'
 
+declare module 'hono' {
+  interface ContextRenderer {
+    (content: string | Promise<string>, props?: { title?: string }): Response
+  }
+}
+
 export const renderer = jsxRenderer(({ children, title }) => {
   return (
     <html lang="vi">
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>{title || 'KPI Warehouse Management System'}</title>
+        <title>{title || 'Perfomance Management System'}</title>
         <script src="https://cdn.tailwindcss.com"></script>
+
+        {/* Inter Font */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet" />
+
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet" />
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
         <style>{`
+          :root {
+            --background: 0 0% 100%;
+            --foreground: 240 10% 3.9%;
+            --card: 0 0% 100%;
+            --card-foreground: 240 10% 3.9%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 240 10% 3.9%;
+            --primary: 240 5.9% 10%;
+            --primary-foreground: 0 0% 98%;
+            --secondary: 240 4.8% 95.9%;
+            --secondary-foreground: 240 5.9% 10%;
+            --muted: 240 4.8% 95.9%;
+            --muted-foreground: 240 3.8% 46.1%;
+            --accent: 240 4.8% 95.9%;
+            --accent-foreground: 240 5.9% 10%;
+            --destructive: 0 84.2% 60.2%;
+            --destructive-foreground: 0 0% 98%;
+            --border: 240 5.9% 90%;
+            --input: 240 5.9% 90%;
+            --ring: 240 5.9% 10%;
+            --radius: 0.5rem;
+          }
+          .dark {
+            --background: 240 10% 3.9%;
+            --foreground: 0 0% 98%;
+            --card: 240 10% 3.9%;
+            --card-foreground: 0 0% 98%;
+            --popover: 240 10% 3.9%;
+            --popover-foreground: 0 0% 98%;
+            --primary: 0 0% 98%;
+            --primary-foreground: 240 5.9% 10%;
+            --secondary: 240 3.7% 15.9%;
+            --secondary-foreground: 0 0% 98%;
+            --muted: 240 3.7% 15.9%;
+            --muted-foreground: 240 5% 64.9%;
+            --accent: 240 3.7% 15.9%;
+            --accent-foreground: 0 0% 98%;
+            --destructive: 0 62.8% 30.6%;
+            --destructive-foreground: 0 0% 98%;
+            --border: 240 3.7% 15.9%;
+            --input: 240 3.7% 15.9%;
+            --ring: 240 4.9% 83.9%;
+          }
+        
+          body {
+            font-family: 'Inter', sans-serif;
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+          }
+
           .fade-in { animation: fadeIn 0.3s ease-in; }
           @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-          .slide-up { animation: slideUp 0.3s ease-out; }
-          @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-          .ranking-5 { background: linear-gradient(135deg, #10b981, #059669); }
-          .ranking-4 { background: linear-gradient(135deg, #3b82f6, #2563eb); }
-          .ranking-3 { background: linear-gradient(135deg, #f59e0b, #d97706); }
-          .ranking-2 { background: linear-gradient(135deg, #f97316, #ea580c); }
-          .ranking-1 { background: linear-gradient(135deg, #ef4444, #dc2626); }
+          
+          .slide-side { animation: slideSide 0.3s ease-out; }
+          @keyframes slideSide { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+          /* Utility class for tailwind config simulation since we use CDN */
+          .bg-background { background-color: hsl(var(--background)); }
+          .text-foreground { color: hsl(var(--foreground)); }
+          .bg-card { background-color: hsl(var(--card)); }
+          .text-card-foreground { color: hsl(var(--card-foreground)); }
+          .bg-primary { background-color: hsl(var(--primary)); }
+          .text-primary-foreground { color: hsl(var(--primary-foreground)); }
+          .bg-secondary { background-color: hsl(var(--secondary)); }
+          .text-secondary-foreground { color: hsl(var(--secondary-foreground)); }
+          .bg-muted { background-color: hsl(var(--muted)); }
+          .text-muted-foreground { color: hsl(var(--muted-foreground)); }
+          .bg-accent { background-color: hsl(var(--accent)); }
+          .text-accent-foreground { color: hsl(var(--accent-foreground)); }
+          .bg-destructive { background-color: hsl(var(--destructive)); }
+          .text-destructive-foreground { color: hsl(var(--destructive-foreground)); }
+          .border-border { border-color: hsl(var(--border)); }
+          .border-input { border-color: hsl(var(--input)); }
         `}</style>
+        <script>{`
+          tailwind.config = {
+            theme: {
+              extend: {
+                colors: {
+                  border: "hsl(var(--border))",
+                  input: "hsl(var(--input))",
+                  ring: "hsl(var(--ring))",
+                  background: "hsl(var(--background))",
+                  foreground: "hsl(var(--foreground))",
+                  primary: {
+                    DEFAULT: "hsl(var(--primary))",
+                    foreground: "hsl(var(--primary-foreground))",
+                  },
+                  secondary: {
+                    DEFAULT: "hsl(var(--secondary))",
+                    foreground: "hsl(var(--secondary-foreground))",
+                  },
+                  destructive: {
+                    DEFAULT: "hsl(var(--destructive))",
+                    foreground: "hsl(var(--destructive-foreground))",
+                  },
+                  muted: {
+                    DEFAULT: "hsl(var(--muted))",
+                    foreground: "hsl(var(--muted-foreground))",
+                  },
+                  accent: {
+                    DEFAULT: "hsl(var(--accent))",
+                    foreground: "hsl(var(--accent-foreground))",
+                  },
+                  popover: {
+                    DEFAULT: "hsl(var(--popover))",
+                    foreground: "hsl(var(--popover-foreground))",
+                  },
+                  card: {
+                    DEFAULT: "hsl(var(--card))",
+                    foreground: "hsl(var(--card-foreground))",
+                  },
+                },
+                borderRadius: {
+                  lg: "var(--radius)",
+                  md: "calc(var(--radius) - 2px)",
+                  sm: "calc(var(--radius) - 4px)",
+                },
+              },
+            },
+          }
+        `}</script>
       </head>
-      <body class="bg-gray-50 min-h-screen">
+      <body class="bg-background text-foreground min-h-screen">
         {children}
       </body>
     </html>

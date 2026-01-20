@@ -1,4 +1,6 @@
 import type { FC, PropsWithChildren } from 'hono/jsx'
+import { MobileHeader } from './MobileHeader'
+import { MobileMenu } from './MobileMenu'
 
 interface LayoutProps extends PropsWithChildren {
   title?: string
@@ -8,69 +10,71 @@ interface LayoutProps extends PropsWithChildren {
   staffName?: string
 }
 
-export const Layout: FC<LayoutProps> = ({ 
-  children, 
-  title, 
+export const Layout: FC<LayoutProps> = ({
+  children,
+  title,
   activeTab,
   warehouseCode,
   staffId,
-  staffName 
+  staffName
 }) => {
   return (
     <div class="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header class="bg-white shadow-sm border-b border-gray-200">
+      {/* Mobile Header & Menu */}
+      <div class="md:hidden">
+        <MobileHeader />
+        <MobileMenu />
+      </div>
+
+      {/* Desktop Header */}
+      <header class="hidden md:block bg-white shadow-sm border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between items-center h-16">
             <div class="flex items-center">
               <a href="/" class="flex items-center">
                 <i class="fas fa-warehouse text-blue-600 text-2xl mr-3"></i>
-                <span class="text-xl font-bold text-gray-900">KPI Warehouse</span>
+                <span class="text-xl font-bold text-gray-900">Performance</span>
               </a>
             </div>
 
             {/* Navigation */}
             <nav class="hidden md:flex space-x-1">
-              <a 
-                href="/employee" 
-                class={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === 'employee' 
-                    ? 'bg-blue-100 text-blue-700' 
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
+              <a
+                href="/employee"
+                class={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'employee'
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'text-gray-600 hover:bg-gray-100'
+                  }`}
               >
                 <i class="fas fa-user mr-2"></i>
                 Nhân viên
               </a>
-              <a 
-                href="/manager" 
-                class={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === 'manager' 
-                    ? 'bg-blue-100 text-blue-700' 
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
+              <a
+                href="/manager"
+                class={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'manager'
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'text-gray-600 hover:bg-gray-100'
+                  }`}
               >
                 <i class="fas fa-users-cog mr-2"></i>
                 Quản lý
               </a>
-              <a 
-                href="/admin" 
-                class={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === 'admin' 
-                    ? 'bg-blue-100 text-blue-700' 
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
+              <a
+                href="/admin"
+                class={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'admin'
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'text-gray-600 hover:bg-gray-100'
+                  }`}
               >
                 <i class="fas fa-cogs mr-2"></i>
                 Admin
               </a>
-              <a 
-                href="/payroll" 
-                class={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === 'payroll' 
-                    ? 'bg-blue-100 text-blue-700' 
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
+              <a
+                href="/payroll"
+                class={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'payroll'
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'text-gray-600 hover:bg-gray-100'
+                  }`}
               >
                 <i class="fas fa-money-check-alt mr-2"></i>
                 Payroll
@@ -81,16 +85,16 @@ export const Layout: FC<LayoutProps> = ({
             <div class="flex items-center space-x-4">
               {/* Demo/Production Mode Toggle */}
               <div class="flex items-center bg-gray-100 rounded-lg p-1">
-                <button 
-                  id="mode-demo" 
+                <button
+                  id="mode-demo"
                   class="px-3 py-1 text-xs font-medium rounded-md transition-colors mode-toggle-btn"
                   data-mode="demo"
                 >
                   <i class="fas fa-flask mr-1"></i>
                   Demo
                 </button>
-                <button 
-                  id="mode-prod" 
+                <button
+                  id="mode-prod"
                   class="px-3 py-1 text-xs font-medium rounded-md transition-colors mode-toggle-btn"
                   data-mode="api"
                 >
@@ -98,7 +102,7 @@ export const Layout: FC<LayoutProps> = ({
                   Production
                 </button>
               </div>
-              
+
               {warehouseCode && (
                 <span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">
                   <i class="fas fa-building mr-1"></i>
@@ -135,7 +139,7 @@ export const Layout: FC<LayoutProps> = ({
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div class="flex justify-between items-center">
             <p class="text-sm text-gray-500">
-              © 2025 Boxme KPI Warehouse Management System v2.0
+              © 2025 Boxme Perfomance Management System v2.0
             </p>
             <div id="api-mode-indicator" class="text-xs px-2 py-1 rounded bg-amber-100 text-amber-800">
               <i class="fas fa-flask mr-1"></i>
@@ -146,7 +150,8 @@ export const Layout: FC<LayoutProps> = ({
       </footer>
 
       {/* Mode Toggle Script */}
-      <script dangerouslySetInnerHTML={{ __html: `
+      <script dangerouslySetInnerHTML={{
+        __html: `
         // API Mode Management
         window.API_MODE = localStorage.getItem('kpi_api_mode') || 'demo';
         window.API_BASE = window.API_MODE === 'demo' ? '/demo' : '/api';
@@ -213,13 +218,13 @@ interface StatCardProps {
   }
 }
 
-export const StatCard: FC<StatCardProps> = ({ 
-  title, 
-  value, 
-  icon, 
+export const StatCard: FC<StatCardProps> = ({
+  title,
+  value,
+  icon,
   color = 'blue',
   subtitle,
-  trend 
+  trend
 }) => {
   const colorClasses = {
     blue: 'bg-blue-500',
@@ -260,10 +265,10 @@ interface RankingBadgeProps {
   showLabel?: boolean
 }
 
-export const RankingBadge: FC<RankingBadgeProps> = ({ 
-  score, 
+export const RankingBadge: FC<RankingBadgeProps> = ({
+  score,
   size = 'md',
-  showLabel = false 
+  showLabel = false
 }) => {
   const labels = {
     5: 'Xuất sắc',

@@ -1,4 +1,4 @@
-# KPI Warehouse Management System v2.2
+# Perfomance Management System v2.2
 
 Hệ thống quản lý KPI kho vận thế hệ mới với tính năng PPH (Points Per Hour), Ranking Score 1-5, và ORS (Operational Risk Score).
 
@@ -226,4 +226,4 @@ webapp/
 
 ---
 
-© 2026 Boxme KPI Warehouse Management System v2.2
+© 2026 Boxme Perfomance Management System v2.2

@@ -26,32 +26,32 @@ app.route('/seed', seed)
 
 // Page routes
 app.get('/', (c) => {
-  return c.render(<HomePage />, { title: 'KPI Warehouse Management System' })
+  return c.render(<HomePage />, { title: 'Perfomance Management System' })
 })
 
 app.get('/employee', (c) => {
   const staffId = c.req.query('staffId')
   const warehouseCode = c.req.query('warehouseCode')
   return c.render(
-    <EmployeePage staffId={staffId} warehouseCode={warehouseCode} />, 
-    { title: 'Dashboard Nhân viên - KPI Warehouse' }
+    <EmployeePage staffId={staffId} warehouseCode={warehouseCode} />,
+    { title: 'Dashboard Nhân viên - Performance' }
   )
 })
 
 app.get('/manager', (c) => {
-  return c.render(<ManagerPage />, { title: 'Dashboard Quản lý - KPI Warehouse' })
+  return c.render(<ManagerPage />, { title: 'Dashboard Quản lý - Performance' })
 })
 
 app.get('/admin', (c) => {
-  return c.render(<AdminPage />, { title: 'Admin Configuration - KPI Warehouse' })
+  return c.render(<AdminPage />, { title: 'Admin Configuration - Performance' })
 })
 
 app.get('/payroll', (c) => {
-  return c.render(<PayrollPage />, { title: 'Payroll KPI Data - KPI Warehouse' })
+  return c.render(<PayrollPage />, { title: 'Payroll KPI Data - Performance' })
 })
 
 app.get('/onboarding', (c) => {
-  return c.render(<OnboardingPage />, { title: 'Hướng dẫn sử dụng - KPI Warehouse' })
+  return c.render(<OnboardingPage />, { title: 'Hướng dẫn sử dụng - Performance' })
 })
 
 // Static files

@@ -1,5 +1,8 @@
 import type { FC } from 'hono/jsx'
-import { Layout, StatCard, RankingBadge, MilestoneBadge, Table } from '../components/Layout'
+import { Layout } from '../components/Layout'
+import { Button } from '../components/ui/Button'
+import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card'
+import { Badge } from '../components/ui/Badge'
 import { tooltipScript } from '../components/Tooltip'
 import { WAREHOUSES } from '../types/database'
 
@@ -12,279 +15,338 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
   const warehouses = Object.entries(WAREHOUSES)
 
   return (
-    <Layout title="Dashboard Nhân viên" activeTab="employee">
+    <Layout title="Nhân viên" activeTab="employee">
       {/* Help Banner */}
-      <div class="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-4 mb-6">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center">
-            <i class="fas fa-lightbulb text-yellow-500 text-xl mr-3"></i>
-            <div>
-              <p class="font-medium text-gray-900">Mới sử dụng? Xem hướng dẫn để hiểu các chỉ số KPI</p>
-              <p class="text-sm text-gray-600">Bấm vào icon <i class="fas fa-info-circle text-blue-500"></i> bên cạnh mỗi chỉ số để xem giải thích chi tiết</p>
+      <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200 mb-4">
+        <CardContent className="p-3 md:p-4">
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <i class="fas fa-lightbulb text-yellow-500 text-lg mt-0.5"></i>
+              <div>
+                <p class="font-medium text-gray-900 text-sm">Lần đầu sử dụng?</p>
+                <p class="text-xs text-gray-600">Xem hướng dẫn để hiểu các chỉ số KPI. Bấm vào icon <i class="fas fa-info-circle text-blue-500"></i> để xem giải thích.</p>
+              </div>
             </div>
+            <Button href="/onboarding" className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto text-sm min-h-[44px]">
+              <i class="fas fa-book-open mr-2"></i>Xem hướng dẫn
+            </Button>
           </div>
-          <a href="/onboarding" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors whitespace-nowrap">
-            <i class="fas fa-book-open mr-2"></i>Hướng dẫn
-          </a>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      {/* Staff Selection Form */}
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4">
-          <i class="fas fa-search mr-2 text-blue-600"></i>
-          Tra cứu KPI Cá nhân
-        </h2>
-        <form id="employee-search-form" class="grid md:grid-cols-4 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Warehouse</label>
-            <select 
-              id="warehouseCode" 
-              name="warehouseCode" 
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">-- Chọn kho --</option>
-              {warehouses.map(([code, info]) => (
-                <option value={code} selected={code === warehouseCode}>{code} - {info.name}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Mã nhân viên</label>
-            <input 
-              type="text" 
-              id="staffId" 
-              name="staffId"
-              value={staffId || ''}
-              placeholder="Nhập mã NV..."
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Tuần</label>
-            <input 
-              type="week" 
-              id="yearWeek" 
-              name="yearWeek"
-              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div class="flex items-end">
-            <button 
-              type="submit" 
-              class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-            >
-              <i class="fas fa-search mr-2"></i>
-              Tra cứu
-            </button>
-          </div>
-        </form>
-      </div>
+      {/* Staff Search Form */}
+      <Card className="mb-4">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base md:text-lg flex items-center gap-2">
+            <i class="fas fa-search text-blue-600"></i>
+            Tra cứu KPI Cá nhân
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form id="employee-search-form" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Kho làm việc *</label>
+              <select
+                id="warehouseCode"
+                name="warehouseCode"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Chọn kho...</option>
+                {warehouses.map(([code, info]) => (
+                  <option value={code} selected={code === warehouseCode}>{code} – {info.name}</option>
+                ))}
+              </select>
+              <p id="error-warehouse" class="text-xs text-red-500 mt-1 hidden">Vui lòng chọn kho.</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Mã nhân viên *</label>
+              <input
+                type="text"
+                id="staffId"
+                name="staffId"
+                value={staffId || ''}
+                placeholder="Ví dụ: EMP020"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <p class="text-xs text-gray-400 mt-1">Mã giống bảng lương/chấm công</p>
+              <p id="error-staffId" class="text-xs text-red-500 mt-1 hidden">Vui lòng nhập mã nhân viên.</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Tuần KPI *</label>
+              <input
+                type="week"
+                id="yearWeek"
+                name="yearWeek"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <p class="text-xs text-gray-400 mt-1">Chọn tuần bạn muốn xem</p>
+              <p id="error-yearWeek" class="text-xs text-red-500 mt-1 hidden">Vui lòng chọn tuần.</p>
+            </div>
+            <div class="flex items-end">
+              <Button type="submit" id="btn-search" className="w-full bg-blue-600 hover:bg-blue-700 min-h-[44px]">
+                <i class="fas fa-search mr-2"></i>
+                Tra cứu KPI
+              </Button>
+            </div>
+          </form>
+          <p id="error-general" class="text-sm text-red-500 mt-3 p-3 bg-red-50 rounded-lg hidden"></p>
+        </CardContent>
+      </Card>
 
       {/* KPI Dashboard (will be populated by JS) */}
       <div id="kpi-dashboard" class="hidden">
         {/* Stats Row */}
-        <div class="grid md:grid-cols-4 gap-6 mb-6">
-          <div id="stat-pph" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-sm font-medium text-gray-500">
-                  PPH (Points/Hour)
-                  <span class="inline-flex items-center justify-center w-5 h-5 ml-1 text-gray-400 hover:text-blue-500 cursor-help transition-colors" data-tooltip-key="pph">
-                    <i class="fas fa-info-circle text-sm"></i>
-                  </span>
-                </p>
-                <p class="text-3xl font-bold text-gray-900 mt-1" id="pph-value">--</p>
-                <p class="text-sm mt-2" id="pph-trend"></p>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-4">
+          <Card id="stat-pph">
+            <CardContent className="p-4 md:p-6">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <p class="text-xs md:text-sm font-medium text-gray-500 flex items-center gap-1">
+                    PPH – Đơn mỗi giờ
+                    <span class="inline-flex items-center justify-center w-4 h-4 text-gray-400 hover:text-blue-500 cursor-help" data-tooltip-key="pph">
+                      <i class="fas fa-info-circle text-xs"></i>
+                    </span>
+                  </p>
+                  <p class="text-2xl md:text-3xl font-bold text-gray-900 mt-1" id="pph-value">--</p>
+                  <p class="text-xs mt-1" id="pph-trend"></p>
+                </div>
+                <div class="bg-blue-500 p-3 md:p-4 rounded-xl shadow-lg shadow-blue-200 flex-shrink-0">
+                  <i class="fas fa-tachometer-alt text-white text-lg md:text-2xl"></i>
+                </div>
               </div>
-              <div class="bg-blue-500 p-4 rounded-xl">
-                <i class="fas fa-tachometer-alt text-white text-2xl"></i>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-sm font-medium text-gray-500">
-                  Ranking Score
-                  <span class="inline-flex items-center justify-center w-5 h-5 ml-1 text-gray-400 hover:text-blue-500 cursor-help transition-colors" data-tooltip-key="ranking">
-                    <i class="fas fa-info-circle text-sm"></i>
-                  </span>
-                </p>
-                <div class="mt-2" id="ranking-badge">--</div>
+          <Card>
+            <CardContent className="p-4 md:p-6">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <p class="text-xs md:text-sm font-medium text-gray-500 flex items-center gap-1">
+                    Mức xếp hạng
+                    <span class="inline-flex items-center justify-center w-4 h-4 text-gray-400 hover:text-blue-500 cursor-help" data-tooltip-key="ranking">
+                      <i class="fas fa-info-circle text-xs"></i>
+                    </span>
+                  </p>
+                  <div class="mt-1" id="ranking-badge">--</div>
+                </div>
+                <div class="bg-yellow-500 p-3 md:p-4 rounded-xl shadow-lg shadow-yellow-200 flex-shrink-0">
+                  <i class="fas fa-star text-white text-lg md:text-2xl"></i>
+                </div>
               </div>
-              <div class="bg-yellow-500 p-4 rounded-xl">
-                <i class="fas fa-star text-white text-2xl"></i>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-sm font-medium text-gray-500">
-                  Điểm Main Task
-                  <span class="inline-flex items-center justify-center w-5 h-5 ml-1 text-gray-400 hover:text-blue-500 cursor-help transition-colors" data-tooltip-key="mainTask">
-                    <i class="fas fa-info-circle text-sm"></i>
-                  </span>
-                </p>
-                <p class="text-3xl font-bold text-gray-900 mt-1" id="main-task-points">--</p>
-                <p class="text-xs text-gray-400 mt-1" id="main-task-name">--</p>
+          <Card>
+            <CardContent className="p-4 md:p-6">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <p class="text-xs md:text-sm font-medium text-gray-500 flex items-center gap-1">
+                    Điểm nhiệm vụ chính
+                    <span class="inline-flex items-center justify-center w-4 h-4 text-gray-400 hover:text-blue-500 cursor-help" data-tooltip-key="mainTask">
+                      <i class="fas fa-info-circle text-xs"></i>
+                    </span>
+                  </p>
+                  <p class="text-2xl md:text-3xl font-bold text-gray-900 mt-1" id="main-task-points">--</p>
+                  <p class="text-xs text-gray-500 mt-1" id="main-task-name">--</p>
+                </div>
+                <div class="bg-green-500 p-3 md:p-4 rounded-xl shadow-lg shadow-green-200 flex-shrink-0">
+                  <i class="fas fa-tasks text-white text-lg md:text-2xl"></i>
+                </div>
               </div>
-              <div class="bg-green-500 p-4 rounded-xl">
-                <i class="fas fa-tasks text-white text-2xl"></i>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-sm font-medium text-gray-500">
-                  Giờ làm việc
-                  <span class="inline-flex items-center justify-center w-5 h-5 ml-1 text-gray-400 hover:text-blue-500 cursor-help transition-colors" data-tooltip-key="workHours">
-                    <i class="fas fa-info-circle text-sm"></i>
-                  </span>
-                </p>
-                <p class="text-3xl font-bold text-gray-900 mt-1" id="work-hours">--</p>
-                <p class="text-xs text-gray-400 mt-1" id="working-days">-- ngày</p>
+          <Card>
+            <CardContent className="p-4 md:p-6">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <p class="text-xs md:text-sm font-medium text-gray-500 flex items-center gap-1">
+                    Giờ làm trong tuần
+                    <span class="inline-flex items-center justify-center w-4 h-4 text-gray-400 hover:text-blue-500 cursor-help" data-tooltip-key="workHours">
+                      <i class="fas fa-info-circle text-xs"></i>
+                    </span>
+                  </p>
+                  <p class="text-2xl md:text-3xl font-bold text-gray-900 mt-1" id="work-hours">--</p>
+                  <p class="text-xs text-gray-500 mt-1" id="working-days">-- ngày</p>
+                </div>
+                <div class="bg-purple-500 p-3 md:p-4 rounded-xl shadow-lg shadow-purple-200 flex-shrink-0">
+                  <i class="fas fa-clock text-white text-lg md:text-2xl"></i>
+                </div>
               </div>
-              <div class="bg-purple-500 p-4 rounded-xl">
-                <i class="fas fa-clock text-white text-2xl"></i>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Task Breakdown & ORS */}
-        <div class="grid md:grid-cols-2 gap-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-4">
           {/* Task Breakdown */}
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-              <i class="fas fa-chart-pie text-blue-600 mr-2"></i>
-              Chi tiết điểm theo Task
-            </h3>
-            <div id="task-breakdown" class="space-y-3">
-              <p class="text-gray-500 text-center py-4">Chưa có dữ liệu</p>
-            </div>
-          </div>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base md:text-lg flex items-center gap-2">
+                <i class="fas fa-chart-pie text-blue-600"></i>
+                Chi tiết điểm theo nhiệm vụ
+                <span class="inline-flex items-center justify-center w-4 h-4 text-gray-400 hover:text-blue-500 cursor-help" data-tooltip-key="taskBreakdown">
+                  <i class="fas fa-info-circle text-xs"></i>
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div id="task-breakdown" class="space-y-2">
+                <p class="text-gray-500 text-center py-4 text-sm">Chưa có dữ liệu</p>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* ORS Summary */}
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-              <i class="fas fa-shield-alt text-red-600 mr-2"></i>
-              Điểm rủi ro ORS (Tháng)
-              <span class="inline-flex items-center justify-center w-5 h-5 ml-1 text-gray-400 hover:text-blue-500 cursor-help transition-colors" data-tooltip-key="ors">
-                <i class="fas fa-info-circle text-sm"></i>
-              </span>
-            </h3>
-            <div id="ors-summary" class="space-y-4">
-              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <p class="text-sm text-gray-500">Tổng điểm ORS</p>
-                  <p class="text-2xl font-bold text-gray-900" id="ors-total">0</p>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base md:text-lg flex items-center gap-2">
+                <i class="fas fa-shield-alt text-red-600"></i>
+                Điểm lỗi ORS (Tháng)
+                <span class="inline-flex items-center justify-center w-4 h-4 text-gray-400 hover:text-blue-500 cursor-help" data-tooltip-key="ors">
+                  <i class="fas fa-info-circle text-xs"></i>
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div id="ors-summary" class="space-y-3">
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                  <div>
+                    <p class="text-xs text-gray-500">Tổng điểm lỗi ORS</p>
+                    <p class="text-xl md:text-2xl font-bold text-gray-900" id="ors-total">0</p>
+                  </div>
+                  <div id="ors-milestone">
+                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">Xanh – Tốt</span>
+                  </div>
                 </div>
-                <div id="ors-milestone">
-                  <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">GREEN</span>
+                <div id="ors-legend" class="text-xs text-gray-500 grid grid-cols-2 gap-1">
+                  <span><span class="inline-block w-2 h-2 bg-green-500 rounded-full mr-1"></span>0–5: Tốt</span>
+                  <span><span class="inline-block w-2 h-2 bg-yellow-500 rounded-full mr-1"></span>6–15: Cần chú ý</span>
+                  <span><span class="inline-block w-2 h-2 bg-orange-500 rounded-full mr-1"></span>16–25: Cảnh báo</span>
+                  <span><span class="inline-block w-2 h-2 bg-red-500 rounded-full mr-1"></span>&gt;25: Nguy hiểm</span>
+                </div>
+                <div id="ors-events" class="space-y-2">
+                  <p class="text-gray-500 text-center py-2 text-xs">Tháng này bạn chưa có lỗi ORS nào. Tiếp tục giữ phong độ!</p>
                 </div>
               </div>
-              <div id="ors-events" class="space-y-2">
-                <p class="text-gray-500 text-center py-2 text-sm">Không có vi phạm</p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Monthly Summary */}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">
-            <i class="fas fa-calendar-alt text-green-600 mr-2"></i>
-            Tổng hợp KPI Tháng
-          </h3>
-          <div id="monthly-summary" class="grid md:grid-cols-5 gap-4">
-            <div class="text-center p-4 bg-blue-50 rounded-lg">
-              <p class="text-sm text-gray-500">
-                Major KPI
-                <span class="inline-flex items-center justify-center w-4 h-4 ml-1 text-gray-400 hover:text-blue-500 cursor-help transition-colors" data-tooltip-key="mainTask">
-                  <i class="fas fa-info-circle text-xs"></i>
-                </span>
-              </p>
-              <p class="text-2xl font-bold text-blue-600" id="monthly-major-kpi">--</p>
+        <Card className="mb-4">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base md:text-lg flex items-center gap-2">
+              <i class="fas fa-calendar-alt text-green-600"></i>
+              Tổng hợp KPI Tháng
+              <span class="inline-flex items-center justify-center w-4 h-4 text-gray-400 hover:text-blue-500 cursor-help" data-tooltip-key="monthlyKpi">
+                <i class="fas fa-info-circle text-xs"></i>
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div id="monthly-summary" class="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-4">
+              <div class="text-center p-3 md:p-4 bg-blue-50 rounded-lg">
+                <p class="text-xs text-gray-500 flex items-center justify-center gap-1">
+                  Tổng điểm KPI
+                  <i class="fas fa-info-circle text-gray-400 hidden md:inline" data-tooltip-key="mainTask"></i>
+                </p>
+                <p class="text-lg md:text-2xl font-bold text-blue-600" id="monthly-major-kpi">--</p>
+              </div>
+              <div class="text-center p-3 md:p-4 bg-yellow-50 rounded-lg">
+                <p class="text-xs text-gray-500 flex items-center justify-center gap-1">
+                  Xếp hạng TB
+                  <i class="fas fa-info-circle text-gray-400 hidden md:inline" data-tooltip-key="ranking"></i>
+                </p>
+                <p class="text-lg md:text-2xl font-bold text-yellow-600" id="monthly-avg-ranking">--</p>
+              </div>
+              <div class="text-center p-3 md:p-4 bg-purple-50 rounded-lg">
+                <p class="text-xs text-gray-500 flex items-center justify-center gap-1">
+                  Hệ số đánh giá
+                  <i class="fas fa-info-circle text-gray-400 hidden md:inline" data-tooltip-key="ratingFactor"></i>
+                </p>
+                <p class="text-lg md:text-2xl font-bold text-purple-600" id="monthly-rating-factor">--</p>
+              </div>
+              <div class="text-center p-3 md:p-4 bg-red-50 rounded-lg">
+                <p class="text-xs text-gray-500 flex items-center justify-center gap-1">
+                  Tỷ lệ trừ ORS
+                  <i class="fas fa-info-circle text-gray-400 hidden md:inline" data-tooltip-key="ors"></i>
+                </p>
+                <p class="text-lg md:text-2xl font-bold text-red-600" id="monthly-ors-penalty">--</p>
+              </div>
+              <div class="text-center p-3 md:p-4 bg-green-50 rounded-lg col-span-2 md:col-span-1">
+                <p class="text-xs text-gray-500 flex items-center justify-center gap-1">
+                  Tiền thưởng KPI
+                  <i class="fas fa-info-circle text-gray-400 hidden md:inline" data-tooltip-key="kpiBonus"></i>
+                </p>
+                <p class="text-lg md:text-2xl font-bold text-green-600" id="monthly-kpi-bonus">--</p>
+              </div>
             </div>
-            <div class="text-center p-4 bg-yellow-50 rounded-lg">
-              <p class="text-sm text-gray-500">
-                Avg Ranking
-                <span class="inline-flex items-center justify-center w-4 h-4 ml-1 text-gray-400 hover:text-blue-500 cursor-help transition-colors" data-tooltip-key="ranking">
-                  <i class="fas fa-info-circle text-xs"></i>
-                </span>
-              </p>
-              <p class="text-2xl font-bold text-yellow-600" id="monthly-avg-ranking">--</p>
-            </div>
-            <div class="text-center p-4 bg-purple-50 rounded-lg">
-              <p class="text-sm text-gray-500">
-                Rating Factor
-                <span class="inline-flex items-center justify-center w-4 h-4 ml-1 text-gray-400 hover:text-blue-500 cursor-help transition-colors" data-tooltip-key="ratingFactor">
-                  <i class="fas fa-info-circle text-xs"></i>
-                </span>
-              </p>
-              <p class="text-2xl font-bold text-purple-600" id="monthly-rating-factor">--</p>
-            </div>
-            <div class="text-center p-4 bg-red-50 rounded-lg">
-              <p class="text-sm text-gray-500">
-                ORS Penalty
-                <span class="inline-flex items-center justify-center w-4 h-4 ml-1 text-gray-400 hover:text-blue-500 cursor-help transition-colors" data-tooltip-key="ors">
-                  <i class="fas fa-info-circle text-xs"></i>
-                </span>
-              </p>
-              <p class="text-2xl font-bold text-red-600" id="monthly-ors-penalty">--</p>
-            </div>
-            <div class="text-center p-4 bg-green-50 rounded-lg">
-              <p class="text-sm text-gray-500">
-                KPI Bonus
-                <span class="inline-flex items-center justify-center w-4 h-4 ml-1 text-gray-400 hover:text-blue-500 cursor-help transition-colors" data-tooltip-key="kpiBonus">
-                  <i class="fas fa-info-circle text-xs"></i>
-                </span>
-              </p>
-              <p class="text-2xl font-bold text-green-600" id="monthly-kpi-bonus">--</p>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Ranking History Chart */}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">
-            <i class="fas fa-chart-line text-purple-600 mr-2"></i>
-            Lịch sử Ranking (12 tuần gần nhất)
-          </h3>
-          <div class="h-64">
-            <canvas id="ranking-history-chart"></canvas>
-          </div>
-        </div>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base md:text-lg flex items-center gap-2">
+              <i class="fas fa-chart-line text-purple-600"></i>
+              Lịch sử xếp hạng (12 tuần)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div class="h-56 md:h-64">
+              <canvas id="ranking-history-chart"></canvas>
+            </div>
+            <p id="ranking-summary" class="text-xs text-gray-500 text-center mt-2 hidden"></p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Empty State */}
-      <div id="empty-state" class="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-        <i class="fas fa-chart-bar text-gray-300 text-6xl mb-4"></i>
-        <h3 class="text-xl font-semibold text-gray-700 mb-2">Chưa có dữ liệu</h3>
-        <p class="text-gray-500">Vui lòng nhập Mã NV và chọn Warehouse để xem KPI</p>
-      </div>
+      <Card id="empty-state" className="p-8 md:p-12 text-center">
+        <CardContent>
+          <div class="w-16 h-16 md:w-20 md:h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
+            <i class="fas fa-chart-bar text-gray-400 text-2xl md:text-4xl"></i>
+          </div>
+          <h3 class="text-lg md:text-xl font-bold text-gray-900 mb-2">Chưa có dữ liệu KPI</h3>
+          <p class="text-sm text-gray-500">Nhập mã nhân viên, chọn kho và tuần để xem KPI của bạn.</p>
+        </CardContent>
+      </Card>
 
       {/* JavaScript for fetching and displaying data */}
-      <script dangerouslySetInnerHTML={{ __html: `
+      <script dangerouslySetInnerHTML={{
+        __html: `
         // Use dynamic API_BASE from Layout (demo or api)
         let rankingChart = null;
 
         document.getElementById('employee-search-form').addEventListener('submit', async (e) => {
           e.preventDefault();
-          const staffId = document.getElementById('staffId').value;
+          
+          // Clear previous errors
+          ['error-warehouse', 'error-staffId', 'error-yearWeek', 'error-general'].forEach(id => {
+            document.getElementById(id)?.classList.add('hidden');
+          });
+          
+          const staffId = document.getElementById('staffId').value.trim();
           const warehouseCode = document.getElementById('warehouseCode').value;
           const yearWeek = document.getElementById('yearWeek').value;
-
-          if (!staffId) {
-            alert('Vui lòng nhập Mã nhân viên');
-            return;
+          
+          // Inline validation
+          let hasError = false;
+          if (!warehouseCode) {
+            document.getElementById('error-warehouse').classList.remove('hidden');
+            hasError = true;
           }
+          if (!staffId) {
+            document.getElementById('error-staffId').classList.remove('hidden');
+            hasError = true;
+          }
+          if (!yearWeek) {
+            document.getElementById('error-yearWeek').classList.remove('hidden');
+            hasError = true;
+          }
+          
+          if (hasError) return;
 
           await loadEmployeeData(staffId, warehouseCode, yearWeek);
         });
@@ -321,26 +383,38 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
               document.getElementById('work-hours').textContent = weekly.current.estimated_work_hours?.toFixed(1) || '--';
               document.getElementById('working-days').textContent = (weekly.current.working_days || 0) + ' ngày';
 
-              // Task breakdown
+              // Task breakdown with Vietnamese names
               const taskDetail = weekly.current.task_points_detail || {};
+              const taskNames = {
+                'packing': '\u0110\u00f3ng g\u00f3i',
+                'picking': 'L\u1ea5y h\u00e0ng',
+                'handover': 'Giao h\u00e0ng',
+                'receiving': 'Nh\u1eadn h\u00e0ng',
+                'returns': 'Tr\u1ea3 h\u00e0ng',
+                'inventory': 'Ki\u1ec3m k\u00ea'
+              };
               const taskHtml = Object.entries(taskDetail)
                 .filter(([_, v]) => v.points > 0)
                 .sort((a, b) => b[1].points - a[1].points)
-                .map(([task, v]) => \`
-                  <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
-                    <span class="font-medium text-gray-700 capitalize">\${task.replace('_', ' ')}</span>
-                    <span class="text-gray-900">\${v.points.toLocaleString()} điểm</span>
-                  </div>
-                \`).join('') || '<p class="text-gray-500 text-center py-4">Không có dữ liệu</p>';
+                .map(([task, v]) => {
+                  const displayName = taskNames[task.toLowerCase()] || task.replace('_', ' ');
+                  return \`
+                    <div class="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg border border-gray-100">
+                      <span class="font-medium text-gray-700">\${displayName}</span>
+                      <span class="font-bold text-gray-900">\${v.points.toLocaleString()} \u0111i\u1ec3m</span>
+                    </div>
+                  \`;
+                }).join('') || '<p class="text-gray-500 text-center py-4 text-sm">Kh\u00f4ng c\u00f3 d\u1eef li\u1ec7u</p>';
               document.getElementById('task-breakdown').innerHTML = taskHtml;
 
               // PPH trend
               if (weekly.comparison) {
                 const trend = weekly.comparison.pphChange;
                 document.getElementById('pph-trend').innerHTML = \`
-                  <span class="\${trend >= 0 ? 'text-green-600' : 'text-red-600'}">
+                  <span class="\${trend >= 0 ? 'text-green-600' : 'text-red-600'} font-medium flex items-center">
                     <i class="fas fa-arrow-\${trend >= 0 ? 'up' : 'down'} mr-1"></i>
-                    \${Math.abs(trend).toFixed(2)} so với tuần trước
+                    \${Math.abs(trend).toFixed(2)}
+                    <span class="text-gray-400 text-xs ml-1">vs tuần trước</span>
                   </span>
                 \`;
               }
@@ -352,9 +426,9 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
               const colors = { 5: 'ranking-5', 4: 'ranking-4', 3: 'ranking-3', 2: 'ranking-2', 1: 'ranking-1' };
               const labels = { 5: 'Xuất sắc', 4: 'Tốt', 3: 'Đạt', 2: 'Cải thiện', 1: 'Chưa đạt' };
               document.getElementById('ranking-badge').innerHTML = \`
-                <div class="flex items-center gap-2">
-                  <div class="\${colors[score]} w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg">\${score}</div>
-                  <span class="text-sm text-gray-600">\${labels[score]}</span>
+                <div class="flex items-center gap-3">
+                  <div class="\${colors[score]} w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">\${score}</div>
+                  <span class="font-bold text-gray-700">\${labels[score]}</span>
                 </div>
               \`;
             }
@@ -370,18 +444,25 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
                 RED: 'bg-red-100 text-red-800',
                 CRITICAL: 'bg-red-900 text-white'
               };
+              const milestoneLabels = {
+                GREEN: 'Xanh \u2013 T\u1ed1t',
+                YELLOW: 'V\u00e0ng \u2013 C\u1ea7n ch\u00fa \u00fd',
+                ORANGE: 'Cam \u2013 C\u1ea3nh b\u00e1o',
+                RED: '\u0110\u1ecf \u2013 Nguy hi\u1ec3m',
+                CRITICAL: 'Nghi\u00eam tr\u1ecdng'
+              };
               const level = ors.summary.milestone_level || 'GREEN';
               document.getElementById('ors-milestone').innerHTML = \`
-                <span class="\${milestoneColors[level]} px-3 py-1 rounded-full text-sm font-medium">\${level}</span>
+                <span class="\${milestoneColors[level]} px-3 py-1 rounded-full text-xs font-bold">\${milestoneLabels[level]}</span>
               \`;
             }
 
             if (ors?.events && ors.events.length > 0) {
               document.getElementById('ors-events').innerHTML = ors.events.slice(0, 5).map(e => \`
-                <div class="flex items-center justify-between p-2 bg-red-50 rounded text-sm">
+                <div class="flex items-center justify-between p-2 bg-red-50 rounded text-sm border border-red-100">
                   <div>
-                    <span class="font-medium">\${e.ors_code}</span>
-                    <span class="text-gray-500 ml-2">\${e.event_date}</span>
+                    <span class="font-medium text-gray-900">\${e.ors_code}</span>
+                    <span class="text-gray-500 ml-2 text-xs">\${e.event_date}</span>
                   </div>
                   <span class="font-bold text-red-600">-\${e.ors_points}</span>
                 </div>
@@ -404,7 +485,9 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
 
           } catch (error) {
             console.error('Error loading data:', error);
-            alert('Không thể tải dữ liệu. Vui lòng thử lại.');
+            const errorEl = document.getElementById('error-general');
+            errorEl.textContent = 'Kh\u00f4ng t\u1ea3i \u0111\u01b0\u1ee3c d\u1eef li\u1ec7u KPI. Vui l\u00f2ng ki\u1ec3m tra m\u1ea1ng ho\u1eb7c th\u1eed l\u1ea1i sau.';
+            errorEl.classList.remove('hidden');
           }
         }
 
@@ -451,11 +534,14 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
                   type: 'linear',
                   display: true,
                   position: 'left',
-                  min: 1,
-                  max: 5,
+                  min: 0,
+                  max: 5.5,
                   title: {
                     display: true,
                     text: 'Ranking'
+                  },
+                  grid: {
+                    borderDash: [5, 5]
                   }
                 },
                 y1: {
@@ -469,6 +555,11 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
                     display: true,
                     text: 'PPH'
                   }
+                }
+              },
+              plugins: {
+                legend: {
+                    position: 'bottom'
                 }
               }
             }

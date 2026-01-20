@@ -1,4 +1,11 @@
-// Utility functions for KPI Warehouse Management System
+import { clsx, type ClassValue } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+// Utility functions for Perfomance Management System
 
 /**
  * Get ISO week string from date (YYYY-Www format)
@@ -65,10 +72,10 @@ export function getWeeksInPeriod(payrollPeriod: string): string[] {
   const [year, month] = payrollPeriod.split('-').map(Number)
   const startDate = new Date(year, month - 1, 1)
   const endDate = new Date(year, month, 0)
-  
+
   const weeks: string[] = []
   const currentDate = new Date(startDate)
-  
+
   while (currentDate <= endDate) {
     const weekStr = getISOWeekString(currentDate)
     if (!weeks.includes(weekStr)) {
@@ -76,7 +83,7 @@ export function getWeeksInPeriod(payrollPeriod: string): string[] {
     }
     currentDate.setDate(currentDate.getDate() + 7)
   }
-  
+
   return weeks
 }
 

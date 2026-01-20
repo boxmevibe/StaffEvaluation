@@ -7,27 +7,27 @@ export const AdminPage: FC = () => {
 
   return (
     <Layout title="Admin Configuration" activeTab="admin">
-      {/* Tabs */}
+      {/* Tabs - Horizontal Scroll on Mobile */}
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
-        <div class="border-b border-gray-200">
-          <nav class="flex -mb-px">
-            <button onclick="showTab('ranking')" id="tab-ranking" class="px-6 py-4 text-sm font-medium border-b-2 border-blue-500 text-blue-600">
-              <i class="fas fa-star mr-2"></i>Ranking Config
+        <div class="border-b border-gray-200 overflow-x-auto">
+          <nav class="flex -mb-px min-w-max" style="-webkit-overflow-scrolling: touch;">
+            <button onclick="showTab('ranking')" id="tab-ranking" class="px-4 md:px-6 py-3 md:py-4 text-sm font-medium border-b-2 border-blue-500 text-blue-600 whitespace-nowrap">
+              <span class="mr-1.5">⭐</span>Xếp hạng
             </button>
-            <button onclick="showTab('role')" id="tab-role" class="px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
-              <i class="fas fa-user-tag mr-2"></i>Role-Task Mapping
+            <button onclick="showTab('role')" id="tab-role" class="px-4 md:px-6 py-3 md:py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap">
+              <span class="mr-1.5">👤</span>Vị trí
             </button>
-            <button onclick="showTab('ors')" id="tab-ors" class="px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
-              <i class="fas fa-exclamation-triangle mr-2"></i>ORS Catalog
+            <button onclick="showTab('ors')" id="tab-ors" class="px-4 md:px-6 py-3 md:py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap">
+              <span class="mr-1.5">⚠️</span>Danh mục lỗi
             </button>
-            <button onclick="showTab('bonus')" id="tab-bonus" class="px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
-              <i class="fas fa-money-bill mr-2"></i>Bonus Config
+            <button onclick="showTab('bonus')" id="tab-bonus" class="px-4 md:px-6 py-3 md:py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap">
+              <span class="mr-1.5">💰</span>Thưởng
             </button>
-            <button onclick="showTab('jobs')" id="tab-jobs" class="px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
-              <i class="fas fa-cogs mr-2"></i>Run Jobs
+            <button onclick="showTab('jobs')" id="tab-jobs" class="px-4 md:px-6 py-3 md:py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap">
+              <span class="mr-1.5">⚙️</span>Chạy Jobs
             </button>
-            <button onclick="showTab('seed')" id="tab-seed" class="px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">
-              <i class="fas fa-database mr-2"></i>Sample Data
+            <button onclick="showTab('seed')" id="tab-seed" class="px-4 md:px-6 py-3 md:py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap">
+              <span class="mr-1.5">📊</span>Dữ liệu mẫu
             </button>
           </nav>
         </div>
@@ -35,44 +35,48 @@ export const AdminPage: FC = () => {
 
       {/* Ranking Config Tab */}
       <div id="content-ranking" class="tab-content">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">
-              <i class="fas fa-sliders-h text-blue-600 mr-2"></i>
-              Cấu hình ngưỡng PPH cho Ranking
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+          {/* Section Header */}
+          <div class="mb-4">
+            <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+              ⭐ Cấu hình xếp hạng năng suất
             </h3>
-            <div class="flex items-center gap-3">
-              <label class="flex items-center">
-                <input type="checkbox" id="ranking-show-inactive" onchange="loadRankingConfig()" class="mr-2" />
-                <span class="text-sm text-gray-600">Hiện inactive</span>
-              </label>
-              <select id="ranking-warehouse-filter" onchange="loadRankingConfig()" class="border border-gray-300 rounded-lg px-3 py-2">
-                <option value="">Global (All)</option>
-                {warehouses.map(([code, info]) => (
-                  <option value={code}>{code}</option>
-                ))}
-              </select>
-              <button onclick="openRankingModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                <i class="fas fa-plus mr-2"></i>Thêm mới
-              </button>
-            </div>
+            <p class="text-sm text-gray-500 mt-1">Đặt ngưỡng PPH để xếp hạng nhân viên từ 1-5 sao theo kho và vị trí.</p>
           </div>
-          <div class="overflow-x-auto">
-            <table class="w-full">
+
+          {/* Filters - Stack on mobile */}
+          <div class="flex flex-col md:flex-row md:items-center gap-3 mb-4">
+            <label class="flex items-center min-h-[44px]">
+              <input type="checkbox" id="ranking-show-inactive" onchange="loadRankingConfig()" class="w-5 h-5 mr-2" />
+              <span class="text-sm text-gray-600">Hiện cả cấu hình đã tắt</span>
+            </label>
+            <select id="ranking-warehouse-filter" onchange="loadRankingConfig()" class="border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px]">
+              <option value="">Tất cả kho</option>
+              {warehouses.map(([code, info]) => (
+                <option value={code}>{code}</option>
+              ))}
+            </select>
+            <button onclick="openRankingModal()" class="bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 min-h-[44px] font-medium">
+              <i class="fas fa-plus mr-2"></i>Thêm mới
+            </button>
+          </div>
+          {/* Table with Vietnamese headers */}
+          <div class="overflow-x-auto -mx-4 md:mx-0">
+            <table class="w-full min-w-[600px]">
               <thead class="bg-gray-50">
                 <tr>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Warehouse</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Role</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">PPH Min</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">PPH Max</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Ranking</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Min Hours</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Active</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Actions</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Kho</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Vị trí</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">PPH tối thiểu</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">PPH tối đa</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Mức xếp hạng</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Giờ/tuần</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Trạng thái</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Thao tác</th>
                 </tr>
               </thead>
               <tbody id="ranking-config-body" class="divide-y divide-gray-200">
-                <tr><td colspan="8" class="px-4 py-8 text-center text-gray-500">Loading...</td></tr>
+                <tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin mr-2"></i>Đang tải...</td></tr>
               </tbody>
             </table>
           </div>
@@ -81,37 +85,42 @@ export const AdminPage: FC = () => {
 
       {/* Role-Task Mapping Tab */}
       <div id="content-role" class="tab-content hidden">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">
-              <i class="fas fa-link text-purple-600 mr-2"></i>
-              Mapping Role → Main Task
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+          {/* Section Header */}
+          <div class="mb-4">
+            <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+              👤 Gán vị trí ↔ Nhiệm vụ chính
             </h3>
-            <div class="flex items-center gap-3">
-              <label class="flex items-center">
-                <input type="checkbox" id="role-show-inactive" onchange="loadRoleConfig()" class="mr-2" />
-                <span class="text-sm text-gray-600">Hiện inactive</span>
-              </label>
-              <button onclick="openRoleModal()" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
-                <i class="fas fa-plus mr-2"></i>Thêm mới
-              </button>
-            </div>
+            <p class="text-sm text-gray-500 mt-1">Chọn nhiệm vụ chính cho từng vị trí công việc (ví dụ: Packer, Picker, QC).</p>
           </div>
-          <div class="overflow-x-auto">
-            <table class="w-full">
+
+          {/* Filters */}
+          <div class="flex flex-col md:flex-row md:items-center gap-3 mb-4">
+            <label class="flex items-center min-h-[44px]">
+              <input type="checkbox" id="role-show-inactive" onchange="loadRoleConfig()" class="w-5 h-5 mr-2" />
+              <span class="text-sm text-gray-600">Hiện cả cấu hình đã tắt</span>
+            </label>
+            <button onclick="openRoleModal()" class="bg-purple-600 text-white px-4 py-2.5 rounded-lg hover:bg-purple-700 min-h-[44px] font-medium">
+              <i class="fas fa-plus mr-2"></i>Thêm mới
+            </button>
+          </div>
+
+          {/* Table with Vietnamese headers */}
+          <div class="overflow-x-auto -mx-4 md:mx-0">
+            <table class="w-full min-w-[600px]">
               <thead class="bg-gray-50">
                 <tr>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Warehouse</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Role</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Role ID</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Main Task</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Effective From</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Active</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Actions</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Kho</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Tên vị trí</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Mã HRM</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Nhiệm vụ chính</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Áp dụng từ</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Trạng thái</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Thao tác</th>
                 </tr>
               </thead>
               <tbody id="role-config-body" class="divide-y divide-gray-200">
-                <tr><td colspan="7" class="px-4 py-8 text-center text-gray-500">Loading...</td></tr>
+                <tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin mr-2"></i>Đang tải...</td></tr>
               </tbody>
             </table>
           </div>
@@ -120,40 +129,43 @@ export const AdminPage: FC = () => {
 
       {/* ORS Catalog Tab */}
       <div id="content-ors" class="tab-content hidden">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">
-              <i class="fas fa-list text-red-600 mr-2"></i>
-              Danh mục lỗi vi phạm ORS
-            </h3>
-            <div class="flex items-center gap-3">
-              <label class="flex items-center">
-                <input type="checkbox" id="ors-show-inactive" onchange="loadOrsCatalog()" class="mr-2" />
-                <span class="text-sm text-gray-600">Hiện inactive</span>
-              </label>
-              <button onclick="openOrsModal()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
-                <i class="fas fa-plus mr-2"></i>Thêm mới
-              </button>
-            </div>
-          </div>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+          {/* Section Header */}
           <div class="mb-4">
-            <input type="text" id="ors-search" placeholder="Tìm kiếm..." onkeyup="filterOrsCatalog()" class="w-full md:w-64 border border-gray-300 rounded-lg px-3 py-2" />
+            <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+              ⚠️ Danh mục lỗi ORS
+            </h3>
+            <p class="text-sm text-gray-500 mt-1">Quản lý danh sách lỗi vi phạm trong công việc, mức độ nghiêm trọng và điểm phạt.</p>
           </div>
-          <div class="overflow-x-auto">
-            <table class="w-full">
+
+          {/* Filters */}
+          <div class="flex flex-col md:flex-row md:items-center gap-3 mb-4">
+            <input type="text" id="ors-search" placeholder="Tìm theo mã, tên hoặc mô tả..." onkeyup="filterOrsCatalog()" class="flex-1 border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px]" />
+            <label class="flex items-center min-h-[44px]">
+              <input type="checkbox" id="ors-show-inactive" onchange="loadOrsCatalog()" class="w-5 h-5 mr-2" />
+              <span class="text-sm text-gray-600">Hiện cả lỗi đã tắt</span>
+            </label>
+            <button onclick="openOrsModal()" class="bg-red-600 text-white px-4 py-2.5 rounded-lg hover:bg-red-700 min-h-[44px] font-medium">
+              <i class="fas fa-plus mr-2"></i>Thêm mới
+            </button>
+          </div>
+
+          {/* Table with Vietnamese headers */}
+          <div class="overflow-x-auto -mx-4 md:mx-0">
+            <table class="w-full min-w-[600px]">
               <thead class="bg-gray-50">
                 <tr>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Code</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Nhóm</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Tên lỗi</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Mức độ</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Điểm phạt</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Active</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Actions</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Mã lỗi</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Nhóm công việc</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Tên lỗi</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Mức độ</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Điểm phạt</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Trạng thái</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Thao tác</th>
                 </tr>
               </thead>
               <tbody id="ors-catalog-body" class="divide-y divide-gray-200">
-                <tr><td colspan="7" class="px-4 py-8 text-center text-gray-500">Loading...</td></tr>
+                <tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin mr-2"></i>Đang tải...</td></tr>
               </tbody>
             </table>
           </div>
@@ -162,38 +174,43 @@ export const AdminPage: FC = () => {
 
       {/* Bonus Config Tab */}
       <div id="content-bonus" class="tab-content hidden">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">
-              <i class="fas fa-calculator text-green-600 mr-2"></i>
-              Cấu hình tính thưởng KPI
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+          {/* Section Header */}
+          <div class="mb-4">
+            <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+              💰 Cấu hình thưởng KPI
             </h3>
-            <div class="flex items-center gap-3">
-              <label class="flex items-center">
-                <input type="checkbox" id="bonus-show-inactive" onchange="loadBonusConfig()" class="mr-2" />
-                <span class="text-sm text-gray-600">Hiện inactive</span>
-              </label>
-              <button onclick="openBonusModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-                <i class="fas fa-plus mr-2"></i>Thêm mới
-              </button>
-            </div>
+            <p class="text-sm text-gray-500 mt-1">Thiết lập cách tính tiền thưởng dựa trên điểm KPI hàng tháng.</p>
           </div>
-          <div class="overflow-x-auto">
-            <table class="w-full">
+
+          {/* Filters */}
+          <div class="flex flex-col md:flex-row md:items-center gap-3 mb-4">
+            <label class="flex items-center min-h-[44px]">
+              <input type="checkbox" id="bonus-show-inactive" onchange="loadBonusConfig()" class="w-5 h-5 mr-2" />
+              <span class="text-sm text-gray-600">Hiện cả cấu hình đã tắt</span>
+            </label>
+            <button onclick="openBonusModal()" class="bg-green-600 text-white px-4 py-2.5 rounded-lg hover:bg-green-700 min-h-[44px] font-medium">
+              <i class="fas fa-plus mr-2"></i>Thêm mới
+            </button>
+          </div>
+
+          {/* Table with Vietnamese headers */}
+          <div class="overflow-x-auto -mx-4 md:mx-0">
+            <table class="w-full min-w-[700px]">
               <thead class="bg-gray-50">
                 <tr>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Warehouse</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Country</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Type</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Amount/Point</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Cap</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Currency</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Active</th>
-                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500">Actions</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Kho</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Quốc gia</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Loại tính</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Tiền/1 điểm</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Giới hạn tối đa</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Tiền tệ</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Trạng thái</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Thao tác</th>
                 </tr>
               </thead>
               <tbody id="bonus-config-body" class="divide-y divide-gray-200">
-                <tr><td colspan="8" class="px-4 py-8 text-center text-gray-500">Loading...</td></tr>
+                <tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin mr-2"></i>Đang tải...</td></tr>
               </tbody>
             </table>
           </div>
@@ -202,37 +219,45 @@ export const AdminPage: FC = () => {
 
       {/* Sample Data Tab */}
       <div id="content-seed" class="tab-content hidden">
-        <div class="grid md:grid-cols-2 gap-6">
+        {/* Section Header */}
+        <div class="mb-4">
+          <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+            📊 Dữ liệu mẫu (Demo)
+          </h3>
+          <p class="text-sm text-gray-500 mt-1">Tạo dữ liệu mẫu để test hệ thống. Chỉ dùng cho môi trường Demo.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {/* Current Stats */}
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-              <i class="fas fa-chart-bar text-blue-600 mr-2"></i>
-              Trạng thái dữ liệu hiện tại
-            </h3>
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+            <h4 class="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <i class="fas fa-chart-bar text-blue-600"></i>
+              Trạng thái dữ liệu
+            </h4>
             <div id="seed-stats" class="space-y-3">
               <div class="text-center text-gray-500 py-4">
-                <i class="fas fa-spinner fa-spin mr-2"></i>Loading...
+                <i class="fas fa-spinner fa-spin mr-2"></i>Đang tải...
               </div>
             </div>
-            <button onclick="loadSeedStats()" class="mt-4 w-full bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200">
-              <i class="fas fa-sync mr-2"></i>Refresh Stats
+            <button onclick="loadSeedStats()" class="mt-4 w-full bg-gray-100 text-gray-700 px-4 py-2.5 rounded-lg hover:bg-gray-200 min-h-[44px] font-medium">
+              <i class="fas fa-sync mr-2"></i>Làm mới
             </button>
           </div>
 
           {/* Generate Data */}
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-              <i class="fas fa-magic text-purple-600 mr-2"></i>
-              Generate Sample Data
-            </h3>
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+            <h4 class="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <i class="fas fa-magic text-purple-600"></i>
+              Tạo dữ liệu mẫu
+            </h4>
             <div class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Payroll Period</label>
-                <input type="month" id="seed-period" class="w-full border border-gray-300 rounded-lg px-3 py-2" />
+                <label class="block text-sm font-medium text-gray-700 mb-1">Kỳ lương (tháng)</label>
+                <input type="month" id="seed-period" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px]" />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Number of Weeks</label>
-                <select id="seed-weeks" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Số tuần cần tạo</label>
+                <select id="seed-weeks" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px]">
                   <option value="1">1 tuần</option>
                   <option value="2">2 tuần</option>
                   <option value="3">3 tuần</option>
@@ -242,69 +267,69 @@ export const AdminPage: FC = () => {
               <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
                 <p class="text-sm text-blue-800">
                   <i class="fas fa-info-circle mr-2"></i>
-                  <strong>Sẽ tạo:</strong> ~33 nhân viên × 3 kho × số tuần = 
+                  <strong>Ước tính:</strong> ~33 nhân viên × 3 kho × số tuần =
                   <span id="estimate-records" class="font-bold">132</span> bản ghi/bảng
                 </p>
               </div>
-              <button onclick="generateSeedData()" id="btn-generate" class="w-full bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-3 rounded-lg font-medium hover:from-purple-600 hover:to-blue-600">
+              <button onclick="generateSeedData()" id="btn-generate" class="w-full bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-3 rounded-lg font-medium hover:from-purple-600 hover:to-blue-600 min-h-[48px]">
                 <i class="fas fa-database mr-2"></i>
-                Generate Sample Data
+                Tạo dữ liệu mẫu
               </button>
             </div>
           </div>
         </div>
 
         {/* Data Preview */}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">
-            <i class="fas fa-eye text-green-600 mr-2"></i>
-            Preview dữ liệu mẫu
-          </h3>
-          <div class="mb-4">
-            <select id="preview-table" onchange="loadPreviewData()" class="border border-gray-300 rounded-lg px-3 py-2">
-              <option value="kpi_weekly_summary">KPI Weekly Summary</option>
-              <option value="ranking_weekly_result">Ranking Weekly Result</option>
-              <option value="ors_event">ORS Events</option>
-              <option value="ors_monthly_summary">ORS Monthly Summary</option>
-              <option value="kpi_monthly_summary">KPI Monthly Summary</option>
-              <option value="payroll_kpi_bridge">Payroll KPI Bridge</option>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 mt-4 md:mt-6">
+          <h4 class="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <i class="fas fa-eye text-green-600"></i>
+            Xem trước dữ liệu
+          </h4>
+          <div class="flex flex-col md:flex-row gap-3 mb-4">
+            <select id="preview-table" onchange="loadPreviewData()" class="border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px]">
+              <option value="kpi_weekly_summary">KPI tuần</option>
+              <option value="ranking_weekly_result">Xếp hạng tuần</option>
+              <option value="ors_event">Sự kiện ORS</option>
+              <option value="ors_monthly_summary">ORS tháng</option>
+              <option value="kpi_monthly_summary">KPI tháng</option>
+              <option value="payroll_kpi_bridge">Cầu Payroll</option>
             </select>
-            <span id="preview-count" class="ml-4 text-sm text-gray-500"></span>
+            <span id="preview-count" class="text-sm text-gray-500 py-2"></span>
           </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
+          <div class="overflow-x-auto -mx-4 md:mx-0">
+            <table class="w-full text-sm min-w-[500px]">
               <thead class="bg-gray-50">
                 <tr id="preview-header">
-                  <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Loading...</th>
+                  <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">Đang tải...</th>
                 </tr>
               </thead>
               <tbody id="preview-body" class="divide-y divide-gray-200">
-                <tr><td class="px-3 py-4 text-center text-gray-500">Select a table to preview data</td></tr>
+                <tr><td class="px-3 py-4 text-center text-gray-500">Chọn bảng để xem dữ liệu</td></tr>
               </tbody>
             </table>
           </div>
         </div>
 
-        {/* Danger Zone */}
-        <div class="bg-red-50 border border-red-200 rounded-xl p-6 mt-6">
-          <h3 class="text-lg font-semibold text-red-800 mb-4">
-            <i class="fas fa-exclamation-triangle mr-2"></i>
-            Danger Zone
-          </h3>
-          <div class="flex items-center justify-between">
+        {/* Danger Zone - Improved styling */}
+        <div class="bg-red-50 border-2 border-red-300 rounded-xl p-4 md:p-6 mt-4 md:mt-6">
+          <h4 class="text-base font-bold text-red-800 mb-3 flex items-center gap-2">
+            <i class="fas fa-exclamation-triangle"></i>
+            ⚠️ Vùng nguy hiểm
+          </h4>
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <p class="text-red-700 font-medium">Reset all sample data</p>
-              <p class="text-sm text-red-600">Xóa toàn bộ dữ liệu trong các bảng kết quả (không ảnh hưởng cấu hình)</p>
+              <p class="text-red-700 font-medium">Xóa toàn bộ dữ liệu mẫu</p>
+              <p class="text-sm text-red-600">Xóa dữ liệu trong các bảng kết quả. Không ảnh hưởng cấu hình.</p>
             </div>
-            <button onclick="resetSeedData()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
-              <i class="fas fa-trash mr-2"></i>Reset Data
+            <button onclick="resetSeedData()" class="bg-red-600 text-white px-5 py-2.5 rounded-lg hover:bg-red-700 min-h-[44px] font-medium whitespace-nowrap">
+              <i class="fas fa-trash mr-2"></i>Xóa dữ liệu mẫu
             </button>
           </div>
         </div>
 
         {/* Generation Result */}
-        <div id="seed-result" class="mt-6 hidden">
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div id="seed-result" class="mt-4 md:mt-6 hidden">
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
             <h4 class="font-medium text-gray-900 mb-2">Kết quả:</h4>
             <pre id="seed-output" class="bg-gray-100 p-4 rounded-lg text-sm overflow-x-auto max-h-64"></pre>
           </div>
@@ -313,65 +338,73 @@ export const AdminPage: FC = () => {
 
       {/* Jobs Tab */}
       <div id="content-jobs" class="tab-content hidden">
-        <div class="grid md:grid-cols-2 gap-6">
+        {/* Section Header */}
+        <div class="mb-4">
+          <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+            ⚙️ Chạy tính toán KPI
+          </h3>
+          <p class="text-sm text-gray-500 mt-1">Chạy các Job tính toán điểm KPI, xếp hạng, ORS và thưởng theo kỳ.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {/* Individual Jobs */}
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-              <i class="fas fa-play text-blue-600 mr-2"></i>
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+            <h4 class="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <i class="fas fa-play text-blue-600"></i>
               Chạy Jobs thủ công
-            </h3>
+            </h4>
             <div class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Warehouse (optional)</label>
-                <select id="job-warehouse" class="w-full border border-gray-300 rounded-lg px-3 py-2">
-                  <option value="">All Warehouses</option>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Kho (để trống = tất cả)</label>
+                <select id="job-warehouse" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px]">
+                  <option value="">Tất cả kho</option>
                   {warehouses.map(([code, info]) => (
                     <option value={code}>{code}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tuần (for Job A, B)</label>
-                <input type="week" id="job-week" class="w-full border border-gray-300 rounded-lg px-3 py-2" />
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tuần (cho Job A, B)</label>
+                <input type="week" id="job-week" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px]" />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tháng (for Job C, D)</label>
-                <input type="month" id="job-month" class="w-full border border-gray-300 rounded-lg px-3 py-2" />
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tháng (cho Job C, D)</label>
+                <input type="month" id="job-month" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px]" />
               </div>
               <div class="grid grid-cols-2 gap-3">
-                <button onclick="runJob('a')" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                  <i class="fas fa-calculator mr-2"></i>Job A
+                <button onclick="runJob('a')" class="bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 min-h-[44px] font-medium">
+                  <i class="fas fa-calculator mr-1"></i>Job A
                 </button>
-                <button onclick="runJob('b')" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700">
-                  <i class="fas fa-star mr-2"></i>Job B
+                <button onclick="runJob('b')" class="bg-purple-600 text-white px-4 py-2.5 rounded-lg hover:bg-purple-700 min-h-[44px] font-medium">
+                  <i class="fas fa-star mr-1"></i>Job B
                 </button>
-                <button onclick="runJob('c')" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
-                  <i class="fas fa-shield-alt mr-2"></i>Job C
+                <button onclick="runJob('c')" class="bg-red-600 text-white px-4 py-2.5 rounded-lg hover:bg-red-700 min-h-[44px] font-medium">
+                  <i class="fas fa-shield-alt mr-1"></i>Job C
                 </button>
-                <button onclick="runJob('d')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-                  <i class="fas fa-file-invoice-dollar mr-2"></i>Job D
+                <button onclick="runJob('d')" class="bg-green-600 text-white px-4 py-2.5 rounded-lg hover:bg-green-700 min-h-[44px] font-medium">
+                  <i class="fas fa-money-bill mr-1"></i>Job D
                 </button>
               </div>
             </div>
           </div>
 
           {/* Full Pipeline */}
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">
-              <i class="fas fa-rocket text-orange-600 mr-2"></i>
-              Chạy Full Pipeline
-            </h3>
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+            <h4 class="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <i class="fas fa-rocket text-orange-600"></i>
+              Chạy đầy đủ A → B → C → D
+            </h4>
             <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
               <p class="text-sm text-orange-800">
                 <i class="fas fa-info-circle mr-2"></i>
-                Pipeline sẽ chạy tuần tự: Job A → Job B → Job C → Job D
+                Pipeline sẽ chạy tuần tự tất cả 4 Job cho kỳ đã chọn.
               </p>
             </div>
-            <button onclick="runPipeline()" class="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-3 rounded-lg font-medium hover:from-orange-600 hover:to-red-600">
+            <button onclick="runPipeline()" class="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-3 rounded-lg font-medium hover:from-orange-600 hover:to-red-600 min-h-[48px]">
               <i class="fas fa-play-circle mr-2"></i>
-              Run Full Pipeline
+              Chạy Full Pipeline
             </button>
-            
+
             {/* Job Results */}
             <div id="job-results" class="mt-4 hidden">
               <h4 class="font-medium text-gray-900 mb-2">Kết quả:</h4>
@@ -380,34 +413,43 @@ export const AdminPage: FC = () => {
           </div>
         </div>
 
-        {/* Job Descriptions */}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">
-            <i class="fas fa-info-circle text-gray-600 mr-2"></i>
-            Mô tả Jobs
-          </h3>
-          <div class="grid md:grid-cols-4 gap-4">
-            <div class="p-4 bg-blue-50 rounded-lg">
-              <h4 class="font-medium text-blue-800 mb-2"><i class="fas fa-calculator mr-2"></i>Job A</h4>
-              <p class="text-sm text-blue-600">Build KPI Weekly Summary - Tổng hợp điểm tuần, tính PPH</p>
+        {/* Job Descriptions - Vietnamese with clear explanations */}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 mt-4 md:mt-6">
+          <h4 class="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <i class="fas fa-info-circle text-gray-600"></i>
+            Giải thích các Job
+          </h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+            <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <h5 class="font-bold text-blue-800 mb-2 flex items-center gap-2">
+                <i class="fas fa-calculator"></i>Job A
+              </h5>
+              <p class="text-sm text-blue-700">Tính điểm KPI tuần và PPH (Points Per Hour)</p>
             </div>
-            <div class="p-4 bg-purple-50 rounded-lg">
-              <h4 class="font-medium text-purple-800 mb-2"><i class="fas fa-star mr-2"></i>Job B</h4>
-              <p class="text-sm text-purple-600">Compute Ranking - Chấm ranking score 1-5 dựa trên PPH</p>
+            <div class="p-4 bg-purple-50 rounded-lg border border-purple-200">
+              <h5 class="font-bold text-purple-800 mb-2 flex items-center gap-2">
+                <i class="fas fa-star"></i>Job B
+              </h5>
+              <p class="text-sm text-purple-700">Chấm xếp hạng 1-5 sao dựa trên PPH</p>
             </div>
-            <div class="p-4 bg-red-50 rounded-lg">
-              <h4 class="font-medium text-red-800 mb-2"><i class="fas fa-shield-alt mr-2"></i>Job C</h4>
-              <p class="text-sm text-red-600">Compute ORS Summary - Tổng hợp ORS tháng, xác định milestone</p>
+            <div class="p-4 bg-red-50 rounded-lg border border-red-200">
+              <h5 class="font-bold text-red-800 mb-2 flex items-center gap-2">
+                <i class="fas fa-shield-alt"></i>Job C
+              </h5>
+              <p class="text-sm text-red-700">Tổng hợp lỗi ORS theo tháng</p>
             </div>
-            <div class="p-4 bg-green-50 rounded-lg">
-              <h4 class="font-medium text-green-800 mb-2"><i class="fas fa-file-invoice-dollar mr-2"></i>Job D</h4>
-              <p class="text-sm text-green-600">Build Monthly Summary - Tính KPI Bonus, chuẩn bị cho payroll</p>
+            <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+              <h5 class="font-bold text-green-800 mb-2 flex items-center gap-2">
+                <i class="fas fa-money-bill"></i>Job D
+              </h5>
+              <p class="text-sm text-green-700">Tính thưởng KPI tháng (chuẩn bị payroll)</p>
             </div>
           </div>
         </div>
       </div>
 
-      <script dangerouslySetInnerHTML={{ __html: `
+      <script dangerouslySetInnerHTML={{
+        __html: `
         // Using window.window.API_BASE from Layout;
         let orsCatalogData = [];
 
@@ -1069,7 +1111,7 @@ export const AdminPage: FC = () => {
       `}} />
 
       {/* ========== MODALS ========== */}
-      
+
       {/* Ranking Config Modal */}
       <div id="ranking-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4">
