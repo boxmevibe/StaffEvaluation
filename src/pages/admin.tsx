@@ -20,6 +20,9 @@ export const AdminPage: FC = () => {
             <button onclick="showTab('ors')" id="tab-ors" class="px-4 md:px-6 py-3 md:py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap">
               <span class="mr-1.5">⚠️</span>Danh mục lỗi
             </button>
+            <button onclick="showTab('recovery')" id="tab-recovery" class="px-4 md:px-6 py-3 md:py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap">
+              <span class="mr-1.5">🩹</span>Phục hồi điểm
+            </button>
             <button onclick="showTab('bonus')" id="tab-bonus" class="px-4 md:px-6 py-3 md:py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap">
               <span class="mr-1.5">💰</span>Thưởng
             </button>
@@ -76,7 +79,7 @@ export const AdminPage: FC = () => {
                 </tr>
               </thead>
               <tbody id="ranking-config-body" class="divide-y divide-gray-200">
-                <tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin mr-2"></i>Đang tải...</td></tr>
+                <tr><td colspan={8} class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin mr-2"></i>Đang tải...</td></tr>
               </tbody>
             </table>
           </div>
@@ -120,7 +123,7 @@ export const AdminPage: FC = () => {
                 </tr>
               </thead>
               <tbody id="role-config-body" class="divide-y divide-gray-200">
-                <tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin mr-2"></i>Đang tải...</td></tr>
+                <tr><td colspan={7} class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin mr-2"></i>Đang tải...</td></tr>
               </tbody>
             </table>
           </div>
@@ -165,7 +168,46 @@ export const AdminPage: FC = () => {
                 </tr>
               </thead>
               <tbody id="ors-catalog-body" class="divide-y divide-gray-200">
-                <tr><td colspan="7" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin mr-2"></i>Đang tải...</td></tr>
+                <tr><td colspan={7} class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin mr-2"></i>Đang tải...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {/* Recovery Config Tab */}
+      <div id="content-recovery" class="tab-content hidden">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
+          {/* Section Header */}
+          <div class="mb-4">
+            <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+              🩹 Cấu hình Phục hồi điểm (ORS Recovery)
+            </h3>
+            <p class="text-sm text-gray-500 mt-1">Quản lý các bài tập, thử thách hoặc đề xuất cải tiến để nhân viên gỡ điểm ORS.</p>
+          </div>
+
+          <div class="flex flex-col md:flex-row md:items-center gap-3 mb-4">
+            <input type="text" id="recovery-search" placeholder="Tìm theo tên package..." onkeyup="filterRecoveryCatalog()" class="flex-1 border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px]" />
+            <button onclick="openRecoveryModal()" class="bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 min-h-[44px] font-medium">
+              <i class="fas fa-plus mr-2"></i>Thêm mới
+            </button>
+          </div>
+
+          <div class="overflow-x-auto -mx-4 md:mx-0">
+            <table class="w-full min-w-[700px]">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Mã</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Tiêu đề</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Loại</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Độ khó</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Điểm thưởng</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Trạng thái</th>
+                  <th class="px-3 md:px-4 py-3 text-left text-xs font-medium text-gray-500">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="recovery-catalog-body" class="divide-y divide-gray-200">
+                <tr><td colspan={7} class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin mr-2"></i>Đang tải...</td></tr>
               </tbody>
             </table>
           </div>
@@ -210,7 +252,7 @@ export const AdminPage: FC = () => {
                 </tr>
               </thead>
               <tbody id="bonus-config-body" class="divide-y divide-gray-200">
-                <tr><td colspan="8" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin mr-2"></i>Đang tải...</td></tr>
+                <tr><td colspan={8} class="px-4 py-8 text-center text-gray-500"><i class="fas fa-spinner fa-spin mr-2"></i>Đang tải...</td></tr>
               </tbody>
             </table>
           </div>
@@ -452,6 +494,7 @@ export const AdminPage: FC = () => {
         __html: `
         // Using window.window.API_BASE from Layout;
         let orsCatalogData = [];
+        let recoveryCatalogData = [];
 
         // Set default dates
         const now = new Date();
@@ -479,6 +522,7 @@ export const AdminPage: FC = () => {
           if (tab === 'ranking') loadRankingConfig();
           if (tab === 'role') loadRoleConfig();
           if (tab === 'ors') loadOrsCatalog();
+          if (tab === 'recovery') loadRecoveryCatalog();
           if (tab === 'bonus') loadBonusConfig();
           if (tab === 'seed') { loadSeedStats(); loadPreviewData(); }
         }
@@ -700,414 +744,580 @@ export const AdminPage: FC = () => {
         }
 
         // Load initial data
-        loadRankingConfig();
-
-        // ========== SEED DATA FUNCTIONS ==========
-        // Set default seed period
-        document.getElementById('seed-period').value = new Date().toISOString().slice(0, 7);
-
-        // Update estimate when weeks change
-        document.getElementById('seed-weeks').addEventListener('change', function() {
-          const weeks = parseInt(this.value);
-          document.getElementById('estimate-records').textContent = (33 * weeks).toString();
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRankingConfig();
+            // Make closeModal global if needed or attach to window
+            window.closeModal = function(id) {
+               document.getElementById(id).classList.add('hidden');
+            }
         });
 
-        async function loadSeedStats() {
+        // ============ RECOVERY FUNCTIONS ============
+        async function loadRecoveryCatalog() {
+          try {
+             // Use filter for inactive
+             const term = document.getElementById('recovery-search').value.toLowerCase();
+             
+             // Check if we have a checkbox for inactive (if not, default to showing active or all)
+             // For consistency with other tabs, let's assume we want to support it if added, 
+             // but current UI only has search. We'll use the 'all' endpoint if we want to support toggling status later.
+             // For now, let's fetch ALL and filter client side if needed, OR just fetch ALL to show everything in admin.
+             // But consistent pattern is: /admin/recovery-catalog (active) or /admin/recovery-catalog/all (all).
+             
+             const res = await axios.get(window.API_BASE + '/admin/recovery-catalog/all');
+             recoveryCatalogData = res.data.data || [];
+             
+             // Also apply search filter if exists
+             filterRecoveryCatalog();
+          } catch(e) { console.error(e); }
+        }
+
+        function renderRecoveryCatalog(data) {
+           const diffColors = { EASY: 'text-green-600', MEDIUM: 'text-yellow-600', HARD: 'text-orange-600', VERY_HARD: 'text-red-600' };
+           
+           document.getElementById('recovery-catalog-body').innerHTML = data.map(item => \`
+             <tr class="hover:bg-gray-50 \${!item.is_active ? 'opacity-50' : ''}">
+               <td class="px-4 py-2 font-mono text-xs">\${item.recovery_code}</td>
+               <td class="px-4 py-2 font-medium">\${item.title}</td>
+               <td class="px-4 py-2 text-xs">\${item.recovery_type}</td>
+               <td class="px-4 py-2 text-xs font-bold \${diffColors[item.difficulty]}">\${item.difficulty}</td>
+               <td class="px-4 py-2 text-green-600 font-bold">+\${item.ors_reward}</td>
+               <td class="px-4 py-2">
+                 <button onclick="toggleRecoveryConfig(\${item.id})" class="\${item.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'} px-2 py-1 rounded-full text-xs cursor-pointer hover:opacity-80">
+                   \${item.is_active ? 'Active' : 'Inactive'}
+                 </button>
+               </td>
+               <td class="px-4 py-2">
+                 <button onclick="editRecoveryConfig(\${item.id})" class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-edit"></i></button>
+                 <button onclick="deleteRecoveryConfig(\${item.id})" class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+               </td>
+             </tr>
+           \`).join('') || '<tr><td colspan="7" class="text-center py-4 text-gray-500">Chưa có dữ liệu</td></tr>';
+
+        }
+
+      window.openRecoveryModal = function() {
+        document.getElementById('recovery-id').value = '';
+      document.getElementById('recovery-code').value = '';
+      document.getElementById('recovery-title').value = '';
+      document.getElementById('recovery-type').value = 'QUIZ';
+      document.getElementById('recovery-difficulty').value = 'EASY';
+      document.getElementById('recovery-reward').value = '';
+      document.getElementById('recovery-roles').value = '';
+      document.getElementById('recovery-desc').value = '';
+      document.getElementById('recovery-active').checked = true;
+      document.getElementById('recovery-modal-title').innerText = 'Thêm Recovery Package';
+      document.getElementById('recovery-modal').classList.remove('hidden');
+        }
+
+      window.editRecoveryConfig = function(id) {
+           const item = recoveryCatalogData.find(i => i.id == id);
+      if(!item) return;
+
+      document.getElementById('recovery-id').value = item.id;
+      document.getElementById('recovery-code').value = item.recovery_code;
+      document.getElementById('recovery-title').value = item.title;
+      document.getElementById('recovery-type').value = item.recovery_type;
+      document.getElementById('recovery-difficulty').value = item.difficulty;
+      document.getElementById('recovery-reward').value = item.ors_reward;
+      document.getElementById('recovery-roles').value = Array.isArray(item.target_roles) ? item.target_roles.join(', ') : '';
+      document.getElementById('recovery-desc').value = item.description || '';
+
+      document.getElementById('recovery-modal-title').innerText = 'Sửa Recovery Package';
+      document.getElementById('recovery-modal').classList.remove('hidden');
+        }
+
+      window.saveRecoveryConfig = async function() {
+           const id = document.getElementById('recovery-id').value;
+      const data = {
+        recovery_code: document.getElementById('recovery-code').value,
+      title: document.getElementById('recovery-title').value,
+      recovery_type: document.getElementById('recovery-type').value,
+      difficulty: document.getElementById('recovery-difficulty').value,
+      ors_reward: parseInt(document.getElementById('recovery-reward').value || 0),
+             target_roles: document.getElementById('recovery-roles').value.split(',').map(s => s.trim()).filter(Boolean),
+      description: document.getElementById('recovery-desc').value,
+      is_active: document.getElementById('recovery-active') ? document.getElementById('recovery-active').checked : true
+           };
+
+      try {
+        await axios.post(window.API_BASE + '/admin/recovery-catalog/upsert', { id, ...data });
+      closeRecoveryModal();
+      loadRecoveryCatalog();
+      alert('Đã lưu thành công!');
+           } catch(e) {
+        alert('Lỗi: ' + e.message);
+           }
+        }
+
+      window.deleteRecoveryConfig = async function(id) {
+           if(!confirm('Bạn có chắc muốn xóa?')) return;
+      try {
+        await axios.delete(window.API_BASE + '/admin/recovery-catalog/' + id);
+      loadRecoveryCatalog();
+           } catch(e) {alert('Lỗi: ' + e.message); }
+        }
+
+      window.toggleRecoveryConfig = async function(id) {
+           try {
+        await axios.post(window.API_BASE + '/admin/recovery-catalog/' + id + '/toggle');
+      loadRecoveryCatalog();
+           } catch (error) {
+        alert('Lỗi: ' + (error.response?.data?.error || error.message));
+           }
+        }
+
+      window.filterRecoveryCatalog = function() {
+           const term = document.getElementById('recovery-search').value.toLowerCase();
+           const filtered = recoveryCatalogData.filter(i => i.title.toLowerCase().includes(term) || i.recovery_code.toLowerCase().includes(term));
+      renderRecoveryCatalog(filtered);
+        }
+
+      window.closeRecoveryModal = function() {
+        document.getElementById('recovery-modal').classList.add('hidden');
+        }
+
+      // ========== SEED DATA FUNCTIONS ==========
+      // Set default seed period
+      document.getElementById('seed-period').value = new Date().toISOString().slice(0, 7);
+
+      // Update estimate when weeks change
+      document.getElementById('seed-weeks').addEventListener('change', function() {
+          const weeks = parseInt(this.value);
+      document.getElementById('estimate-records').textContent = (33 * weeks).toString();
+        });
+
+      async function loadSeedStats() {
           try {
             const res = await axios.get('/seed/stats');
-            const stats = res.data.stats;
+      const stats = res.data.stats;
 
-            const tables = [
-              { key: 'kpi_weekly_summary', label: 'KPI Weekly Summary', icon: 'fa-calculator', color: 'blue' },
-              { key: 'ranking_weekly_result', label: 'Ranking Weekly Result', icon: 'fa-star', color: 'purple' },
-              { key: 'ors_event', label: 'ORS Events', icon: 'fa-exclamation-circle', color: 'red' },
-              { key: 'ors_monthly_summary', label: 'ORS Monthly Summary', icon: 'fa-shield-alt', color: 'orange' },
-              { key: 'kpi_monthly_summary', label: 'KPI Monthly Summary', icon: 'fa-chart-line', color: 'green' },
-              { key: 'payroll_kpi_bridge', label: 'Payroll KPI Bridge', icon: 'fa-money-bill', color: 'teal' }
-            ];
+      const tables = [
+      {key: 'kpi_weekly_summary', label: 'KPI Weekly Summary', icon: 'fa-calculator', color: 'blue' },
+      {key: 'ranking_weekly_result', label: 'Ranking Weekly Result', icon: 'fa-star', color: 'purple' },
+      {key: 'ors_event', label: 'ORS Events', icon: 'fa-exclamation-circle', color: 'red' },
+      {key: 'ors_monthly_summary', label: 'ORS Monthly Summary', icon: 'fa-shield-alt', color: 'orange' },
+      {key: 'kpi_monthly_summary', label: 'KPI Monthly Summary', icon: 'fa-chart-line', color: 'green' },
+      {key: 'payroll_kpi_bridge', label: 'Payroll KPI Bridge', icon: 'fa-money-bill', color: 'teal' }
+      ];
 
             document.getElementById('seed-stats').innerHTML = tables.map(t => {
               const count = stats[t.key]?.count || 0;
               const hasData = count > 0;
-              return \`
-                <div class="flex items-center justify-between p-3 bg-\${t.color}-50 rounded-lg">
-                  <div class="flex items-center">
-                    <i class="fas \${t.icon} text-\${t.color}-600 mr-3"></i>
-                    <span class="text-sm font-medium text-gray-700">\${t.label}</span>
-                  </div>
-                  <span class="px-3 py-1 rounded-full text-sm font-bold \${hasData ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-500'}">
-                    \${count.toLocaleString()}
-                  </span>
-                </div>
-              \`;
+      return \`
+      <div class="flex items-center justify-between p-3 bg-\${t.color}-50 rounded-lg">
+        <div class="flex items-center">
+          <i class="fas \${t.icon} text-\${t.color}-600 mr-3"></i>
+          <span class="text-sm font-medium text-gray-700">\${t.label}</span>
+        </div>
+        <span class="px-3 py-1 rounded-full text-sm font-bold \${hasData ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-500'}">
+          \${count.toLocaleString()}
+        </span>
+      </div>
+      \`;
             }).join('');
           } catch (error) {
-            document.getElementById('seed-stats').innerHTML = '<div class="text-red-500">Error loading stats</div>';
+        document.getElementById('seed-stats').innerHTML = '<div class="text-red-500">Error loading stats</div>';
           }
         }
 
-        async function generateSeedData() {
+      async function generateSeedData() {
           const period = document.getElementById('seed-period').value;
-          const weeks = document.getElementById('seed-weeks').value;
+      const weeks = document.getElementById('seed-weeks').value;
 
-          if (!period) {
-            alert('Vui lòng chọn Payroll Period');
-            return;
+      if (!period) {
+        alert('Vui lòng chọn Payroll Period');
+      return;
           }
 
-          const btn = document.getElementById('btn-generate');
-          btn.disabled = true;
-          btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Đang tạo dữ liệu...';
+      const btn = document.getElementById('btn-generate');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Đang tạo dữ liệu...';
 
-          try {
-            document.getElementById('seed-result').classList.remove('hidden');
-            document.getElementById('seed-output').textContent = 'Generating sample data...\\nPeriod: ' + period + '\\nWeeks: ' + weeks;
+      try {
+        document.getElementById('seed-result').classList.remove('hidden');
+      document.getElementById('seed-output').textContent = 'Generating sample data...\\nPeriod: ' + period + '\\nWeeks: ' + weeks;
 
-            const res = await axios.post('/seed/generate', {
-              payrollPeriod: period,
-              weeks: parseInt(weeks)
+      const res = await axios.post('/seed/generate', {
+        payrollPeriod: period,
+      weeks: parseInt(weeks)
             });
 
-            document.getElementById('seed-output').textContent = JSON.stringify(res.data, null, 2);
-            loadSeedStats();
-            loadPreviewData();
+      document.getElementById('seed-output').textContent = JSON.stringify(res.data, null, 2);
+      loadSeedStats();
+      loadPreviewData();
 
-            alert('✅ Tạo dữ liệu thành công!');
+      alert('✅ Tạo dữ liệu thành công!');
           } catch (error) {
-            document.getElementById('seed-output').textContent = 'Error: ' + (error.response?.data?.error || error.message);
-            alert('❌ Lỗi: ' + (error.response?.data?.error || error.message));
+        document.getElementById('seed-output').textContent = 'Error: ' + (error.response?.data?.error || error.message);
+      alert('❌ Lỗi: ' + (error.response?.data?.error || error.message));
           } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-database mr-2"></i>Generate Sample Data';
+        btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-database mr-2"></i>Generate Sample Data';
           }
         }
 
-        async function loadPreviewData() {
+      async function loadPreviewData() {
           const table = document.getElementById('preview-table').value;
 
-          try {
+      try {
             const res = await axios.get('/seed/preview?table=' + table);
-            const data = res.data.data || [];
-            const total = res.data.total || 0;
+      const data = res.data.data || [];
+      const total = res.data.total || 0;
 
-            document.getElementById('preview-count').textContent = total + ' bản ghi (hiển thị ' + data.length + ')';
+      document.getElementById('preview-count').textContent = total + ' bản ghi (hiển thị ' + data.length + ')';
 
-            if (data.length === 0) {
-              document.getElementById('preview-header').innerHTML = '<th class="px-3 py-2 text-left text-xs font-medium text-gray-500">No data</th>';
-              document.getElementById('preview-body').innerHTML = '<tr><td class="px-3 py-4 text-center text-gray-500">Không có dữ liệu. Hãy Generate Sample Data trước.</td></tr>';
-              return;
+      if (data.length === 0) {
+        document.getElementById('preview-header').innerHTML = '<th class="px-3 py-2 text-left text-xs font-medium text-gray-500">No data</th>';
+      document.getElementById('preview-body').innerHTML = '<tr><td class="px-3 py-4 text-center text-gray-500">Không có dữ liệu. Hãy Generate Sample Data trước.</td></tr>';
+      return;
             }
 
             // Get columns from first record
             const columns = Object.keys(data[0]).filter(k => !k.startsWith('_') && k !== 'created_at' && k !== 'updated_at');
 
-            document.getElementById('preview-header').innerHTML = columns.map(c => 
-              '<th class="px-3 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap">' + c.replace(/_/g, ' ') + '</th>'
-            ).join('');
+            document.getElementById('preview-header').innerHTML = columns.map(c =>
+      '<th class="px-3 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap">' + c.replace(/_/g, ' ') + '</th>'
+      ).join('');
 
-            document.getElementById('preview-body').innerHTML = data.map(row => 
-              '<tr class="hover:bg-gray-50">' + columns.map(c => {
-                let val = row[c];
-                if (val === null) val = '-';
-                else if (typeof val === 'number') val = val.toLocaleString();
-                else if (typeof val === 'boolean') val = val ? '✅' : '❌';
-                return '<td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">' + val + '</td>';
+            document.getElementById('preview-body').innerHTML = data.map(row =>
+      '<tr class="hover:bg-gray-50">' + columns.map(c => {
+        let val = row[c];
+        if (val === null) val = '-';
+        else if (typeof val === 'number') val = val.toLocaleString();
+        else if (typeof val === 'boolean') val = val ? '✅' : '❌';
+        return '<td class="px-3 py-2 text-sm text-gray-700 whitespace-nowrap">' + val + '</td>';
               }).join('') + '</tr>'
-            ).join('');
+      ).join('');
           } catch (error) {
-            document.getElementById('preview-body').innerHTML = '<tr><td class="px-3 py-4 text-center text-red-500">Error: ' + error.message + '</td></tr>';
+        document.getElementById('preview-body').innerHTML = '<tr><td class="px-3 py-4 text-center text-red-500">Error: ' + error.message + '</td></tr>';
           }
         }
 
-        async function resetSeedData() {
+      async function resetSeedData() {
           if (!confirm('⚠️ Bạn có chắc muốn xóa toàn bộ dữ liệu sample?\\n\\nĐây là hành động không thể hoàn tác!')) {
             return;
           }
 
-          try {
-            document.getElementById('seed-result').classList.remove('hidden');
-            document.getElementById('seed-output').textContent = 'Resetting data...';
+      try {
+        document.getElementById('seed-result').classList.remove('hidden');
+      document.getElementById('seed-output').textContent = 'Resetting data...';
 
-            const res = await axios.post('/seed/reset');
-            document.getElementById('seed-output').textContent = JSON.stringify(res.data, null, 2);
-            loadSeedStats();
-            loadPreviewData();
+      const res = await axios.post('/seed/reset');
+      document.getElementById('seed-output').textContent = JSON.stringify(res.data, null, 2);
+      loadSeedStats();
+      loadPreviewData();
 
-            alert('✅ Đã reset dữ liệu thành công!');
+      alert('✅ Đã reset dữ liệu thành công!');
           } catch (error) {
-            document.getElementById('seed-output').textContent = 'Error: ' + (error.response?.data?.error || error.message);
-            alert('❌ Lỗi: ' + (error.response?.data?.error || error.message));
+        document.getElementById('seed-output').textContent = 'Error: ' + (error.response?.data?.error || error.message);
+      alert('❌ Lỗi: ' + (error.response?.data?.error || error.message));
           }
         }
 
-        // Auto-load stats and preview when seed tab is shown
-        if (window.location.hash === '#seed' || document.getElementById('tab-seed').classList.contains('border-blue-500')) {
-          loadSeedStats();
-          loadPreviewData();
+      // Auto-load stats and preview when seed tab is shown
+      if (window.location.hash === '#seed' || document.getElementById('tab-seed').classList.contains('border-blue-500')) {
+        loadSeedStats();
+      loadPreviewData();
         }
 
-        // ========== TOGGLE FUNCTIONS ==========
-        async function toggleRankingConfig(id) {
+      // ========== TOGGLE FUNCTIONS ==========
+      async function toggleRankingConfig(id) {
           try {
-            await axios.post(window.API_BASE + '/admin/ranking-config/' + id + '/toggle');
-            loadRankingConfig();
+        await axios.post(window.API_BASE + '/admin/ranking-config/' + id + '/toggle');
+      loadRankingConfig();
           } catch (error) {
-            alert('Lỗi: ' + (error.response?.data?.error || error.message));
+        alert('Lỗi: ' + (error.response?.data?.error || error.message));
           }
         }
 
-        async function toggleRoleConfig(id) {
+      async function toggleRoleConfig(id) {
           try {
-            await axios.post(window.API_BASE + '/admin/role-task-config/' + id + '/toggle');
-            loadRoleConfig();
+        await axios.post(window.API_BASE + '/admin/role-task-config/' + id + '/toggle');
+      loadRoleConfig();
           } catch (error) {
-            alert('Lỗi: ' + (error.response?.data?.error || error.message));
+        alert('Lỗi: ' + (error.response?.data?.error || error.message));
           }
         }
 
-        async function toggleOrsConfig(id) {
+      async function toggleOrsConfig(id) {
           try {
-            await axios.post(window.API_BASE + '/admin/ors-catalog/' + id + '/toggle');
-            loadOrsCatalog();
+        await axios.post(window.API_BASE + '/admin/ors-catalog/' + id + '/toggle');
+      loadOrsCatalog();
           } catch (error) {
-            alert('Lỗi: ' + (error.response?.data?.error || error.message));
+        alert('Lỗi: ' + (error.response?.data?.error || error.message));
           }
         }
 
-        async function toggleBonusConfig(id) {
+      async function toggleBonusConfig(id) {
           try {
-            await axios.post(window.API_BASE + '/admin/bonus-config/' + id + '/toggle');
-            loadBonusConfig();
+        await axios.post(window.API_BASE + '/admin/bonus-config/' + id + '/toggle');
+      loadBonusConfig();
           } catch (error) {
-            alert('Lỗi: ' + (error.response?.data?.error || error.message));
+        alert('Lỗi: ' + (error.response?.data?.error || error.message));
           }
         }
 
-        // ========== DELETE FUNCTIONS ==========
-        async function deleteRankingConfig(id) {
+      // ========== DELETE FUNCTIONS ==========
+      async function deleteRankingConfig(id) {
           if (!confirm('Bạn có chắc muốn xóa cấu hình này?')) return;
-          try {
-            await axios.delete(window.API_BASE + '/admin/ranking-config/' + id);
-            loadRankingConfig();
-            alert('Đã xóa thành công!');
+      try {
+        await axios.delete(window.API_BASE + '/admin/ranking-config/' + id);
+      loadRankingConfig();
+      alert('Đã xóa thành công!');
           } catch (error) {
-            alert('Lỗi: ' + (error.response?.data?.error || error.message));
+        alert('Lỗi: ' + (error.response?.data?.error || error.message));
           }
         }
 
-        async function deleteRoleConfig(id) {
+      async function deleteRoleConfig(id) {
           if (!confirm('Bạn có chắc muốn xóa cấu hình này?')) return;
-          try {
-            await axios.delete(window.API_BASE + '/admin/role-task-config/' + id);
-            loadRoleConfig();
-            alert('Đã xóa thành công!');
+      try {
+        await axios.delete(window.API_BASE + '/admin/role-task-config/' + id);
+      loadRoleConfig();
+      alert('Đã xóa thành công!');
           } catch (error) {
-            alert('Lỗi: ' + (error.response?.data?.error || error.message));
+        alert('Lỗi: ' + (error.response?.data?.error || error.message));
           }
         }
 
-        async function deleteOrsConfig(id) {
+      async function deleteOrsConfig(id) {
           if (!confirm('Bạn có chắc muốn xóa loại lỗi này?')) return;
-          try {
-            await axios.delete(window.API_BASE + '/admin/ors-catalog/' + id);
-            loadOrsCatalog();
-            alert('Đã xóa thành công!');
+      try {
+        await axios.delete(window.API_BASE + '/admin/ors-catalog/' + id);
+      loadOrsCatalog();
+      alert('Đã xóa thành công!');
           } catch (error) {
-            alert('Lỗi: ' + (error.response?.data?.error || error.message));
+        alert('Lỗi: ' + (error.response?.data?.error || error.message));
           }
         }
 
-        async function deleteBonusConfig(id) {
+      async function deleteBonusConfig(id) {
           if (!confirm('Bạn có chắc muốn xóa cấu hình này?')) return;
-          try {
-            await axios.delete(window.API_BASE + '/admin/bonus-config/' + id);
-            loadBonusConfig();
-            alert('Đã xóa thành công!');
+      try {
+        await axios.delete(window.API_BASE + '/admin/bonus-config/' + id);
+      loadBonusConfig();
+      alert('Đã xóa thành công!');
           } catch (error) {
-            alert('Lỗi: ' + (error.response?.data?.error || error.message));
+        alert('Lỗi: ' + (error.response?.data?.error || error.message));
           }
         }
 
-        // ========== MODAL FUNCTIONS ==========
-        let currentEditId = null;
+      // ========== MODAL FUNCTIONS ==========
+      let currentEditId = null;
 
-        function openRankingModal(data = null) {
-          currentEditId = data?.id || null;
-          document.getElementById('ranking-modal').classList.remove('hidden');
-          document.getElementById('ranking-modal-title').textContent = data ? 'Sửa Ranking Config' : 'Thêm Ranking Config';
-          
-          document.getElementById('ranking-warehouse').value = data?.warehouse_code || '';
-          document.getElementById('ranking-role').value = data?.role || '';
-          document.getElementById('ranking-pph-min').value = data?.pph_min || '';
-          document.getElementById('ranking-pph-max').value = data?.pph_max || '';
-          document.getElementById('ranking-score').value = data?.ranking_score || '3';
-          document.getElementById('ranking-min-hours').value = data?.min_weekly_hours || '20';
-          document.getElementById('ranking-active').checked = data?.is_active !== false;
+      function openRankingModal(data = null) {
+        currentEditId = data?.id || null;
+      document.getElementById('ranking-modal').classList.remove('hidden');
+      document.getElementById('ranking-modal-title').textContent = data ? 'Sửa Ranking Config' : 'Thêm Ranking Config';
+
+      document.getElementById('ranking-warehouse').value = data?.warehouse_code || '';
+      document.getElementById('ranking-role').value = data?.role || '';
+      document.getElementById('ranking-pph-min').value = data?.pph_min || '';
+      document.getElementById('ranking-pph-max').value = data?.pph_max || '';
+      document.getElementById('ranking-score').value = data?.ranking_score || '3';
+      document.getElementById('ranking-min-hours').value = data?.min_weekly_hours || '20';
+      document.getElementById('ranking-active').checked = data?.is_active !== false;
         }
 
-        function closeRankingModal() {
-          document.getElementById('ranking-modal').classList.add('hidden');
-          currentEditId = null;
+      function closeRankingModal() {
+        document.getElementById('ranking-modal').classList.add('hidden');
+      currentEditId = null;
         }
 
-        async function saveRankingConfig() {
+      async function saveRankingConfig() {
           const data = {
-            id: currentEditId,
-            warehouse_code: document.getElementById('ranking-warehouse').value || null,
-            role: document.getElementById('ranking-role').value || null,
-            pph_min: document.getElementById('ranking-pph-min').value,
-            pph_max: document.getElementById('ranking-pph-max').value,
-            ranking_score: document.getElementById('ranking-score').value,
-            min_weekly_hours: document.getElementById('ranking-min-hours').value,
-            is_active: document.getElementById('ranking-active').checked
+        id: currentEditId,
+      warehouse_code: document.getElementById('ranking-warehouse').value || null,
+      role: document.getElementById('ranking-role').value || null,
+      pph_min: document.getElementById('ranking-pph-min').value,
+      pph_max: document.getElementById('ranking-pph-max').value,
+      ranking_score: document.getElementById('ranking-score').value,
+      min_weekly_hours: document.getElementById('ranking-min-hours').value,
+      is_active: document.getElementById('ranking-active').checked
           };
 
-          try {
-            await axios.post(window.API_BASE + '/admin/ranking-config/upsert', data);
-            closeRankingModal();
-            loadRankingConfig();
-            alert('Lưu thành công!');
+      try {
+        await axios.post(window.API_BASE + '/admin/ranking-config/upsert', data);
+      closeRankingModal();
+      loadRankingConfig();
+      alert('Lưu thành công!');
           } catch (error) {
-            alert('Lỗi: ' + (error.response?.data?.error || error.message));
+        alert('Lỗi: ' + (error.response?.data?.error || error.message));
           }
         }
 
-        function editRankingConfig(data) {
-          openRankingModal(data);
+      function editRankingConfig(data) {
+        openRankingModal(data);
         }
 
-        function openRoleModal(data = null) {
-          currentEditId = data?.id || null;
-          document.getElementById('role-modal').classList.remove('hidden');
-          document.getElementById('role-modal-title').textContent = data ? 'Sửa Role-Task' : 'Thêm Role-Task';
-          
-          document.getElementById('role-warehouse').value = data?.warehouse_code || '';
-          document.getElementById('role-name').value = data?.role || '';
-          document.getElementById('role-id').value = data?.role_id || '';
-          document.getElementById('role-main-task').value = data?.main_task || 'pack';
-          document.getElementById('role-active').checked = data?.is_active !== false;
+      function openRoleModal(data = null) {
+        currentEditId = data?.id || null;
+      document.getElementById('role-modal').classList.remove('hidden');
+      document.getElementById('role-modal-title').textContent = data ? 'Sửa Role-Task' : 'Thêm Role-Task';
+
+      document.getElementById('role-warehouse').value = data?.warehouse_code || '';
+      document.getElementById('role-name').value = data?.role || '';
+      document.getElementById('role-id').value = data?.role_id || '';
+      document.getElementById('role-main-task').value = data?.main_task || 'pack';
+      document.getElementById('role-active').checked = data?.is_active !== false;
         }
 
-        function closeRoleModal() {
-          document.getElementById('role-modal').classList.add('hidden');
-          currentEditId = null;
+      function closeRoleModal() {
+        document.getElementById('role-modal').classList.add('hidden');
+      currentEditId = null;
         }
 
-        async function saveRoleConfig() {
+      async function saveRoleConfig() {
           const data = {
-            id: currentEditId,
-            warehouse_code: document.getElementById('role-warehouse').value || null,
-            role: document.getElementById('role-name').value,
-            role_id: document.getElementById('role-id').value || null,
-            main_task: document.getElementById('role-main-task').value,
-            is_active: document.getElementById('role-active').checked
+        id: currentEditId,
+      warehouse_code: document.getElementById('role-warehouse').value || null,
+      role: document.getElementById('role-name').value,
+      role_id: document.getElementById('role-id').value || null,
+      main_task: document.getElementById('role-main-task').value,
+      is_active: document.getElementById('role-active').checked
           };
 
-          try {
-            await axios.post(window.API_BASE + '/admin/role-task-config/upsert', data);
-            closeRoleModal();
-            loadRoleConfig();
-            alert('Lưu thành công!');
+      try {
+        await axios.post(window.API_BASE + '/admin/role-task-config/upsert', data);
+      closeRoleModal();
+      loadRoleConfig();
+      alert('Lưu thành công!');
           } catch (error) {
-            alert('Lỗi: ' + (error.response?.data?.error || error.message));
+        alert('Lỗi: ' + (error.response?.data?.error || error.message));
           }
         }
 
-        function editRoleConfig(data) {
-          openRoleModal(data);
+      function editRoleConfig(data) {
+        openRoleModal(data);
         }
 
-        function openOrsModal(data = null) {
-          currentEditId = data?.id || null;
-          document.getElementById('ors-modal').classList.remove('hidden');
-          document.getElementById('ors-modal-title').textContent = data ? 'Sửa ORS' : 'Thêm loại lỗi ORS';
-          
-          document.getElementById('ors-code').value = data?.ors_code || '';
-          document.getElementById('ors-job-group').value = data?.job_group || 'packing';
-          document.getElementById('ors-name').value = data?.name || '';
-          document.getElementById('ors-description').value = data?.description || '';
-          document.getElementById('ors-severity').value = data?.severity_level || 'S2';
-          document.getElementById('ors-points').value = data?.ors_points || '3';
-          document.getElementById('ors-active').checked = data?.is_active !== false;
+      function openOrsModal(data = null) {
+        currentEditId = data?.id || null;
+      document.getElementById('ors-modal').classList.remove('hidden');
+      document.getElementById('ors-modal-title').textContent = data ? 'Sửa ORS' : 'Thêm loại lỗi ORS';
+
+      document.getElementById('ors-code').value = data?.ors_code || '';
+      document.getElementById('ors-job-group').value = data?.job_group || 'packing';
+      document.getElementById('ors-name').value = data?.name || '';
+      document.getElementById('ors-description').value = data?.description || '';
+      document.getElementById('ors-severity').value = data?.severity_level || 'S2';
+      document.getElementById('ors-points').value = data?.ors_points || '3';
+      document.getElementById('ors-active').checked = data?.is_active !== false;
         }
 
-        function closeOrsModal() {
-          document.getElementById('ors-modal').classList.add('hidden');
-          currentEditId = null;
+      function closeOrsModal() {
+        document.getElementById('ors-modal').classList.add('hidden');
+      currentEditId = null;
         }
 
-        async function saveOrsConfig() {
+      async function saveOrsConfig() {
           const data = {
-            id: currentEditId,
-            ors_code: document.getElementById('ors-code').value,
-            job_group: document.getElementById('ors-job-group').value,
-            name: document.getElementById('ors-name').value,
-            description: document.getElementById('ors-description').value || null,
-            severity_level: document.getElementById('ors-severity').value,
-            ors_points: document.getElementById('ors-points').value,
-            is_active: document.getElementById('ors-active').checked
+        id: currentEditId,
+      ors_code: document.getElementById('ors-code').value,
+      job_group: document.getElementById('ors-job-group').value,
+      name: document.getElementById('ors-name').value,
+      description: document.getElementById('ors-description').value || null,
+      severity_level: document.getElementById('ors-severity').value,
+      ors_points: document.getElementById('ors-points').value,
+      is_active: document.getElementById('ors-active').checked
           };
 
-          try {
-            await axios.post(window.API_BASE + '/admin/ors-catalog/upsert', data);
-            closeOrsModal();
-            loadOrsCatalog();
-            alert('Lưu thành công!');
+      try {
+        await axios.post(window.API_BASE + '/admin/ors-catalog/upsert', data);
+      closeOrsModal();
+      loadOrsCatalog();
+      alert('Lưu thành công!');
           } catch (error) {
-            alert('Lỗi: ' + (error.response?.data?.error || error.message));
+        alert('Lỗi: ' + (error.response?.data?.error || error.message));
           }
         }
 
-        function editOrsConfig(data) {
-          openOrsModal(data);
+      function editOrsConfig(data) {
+        openOrsModal(data);
         }
 
-        function openBonusModal(data = null) {
-          currentEditId = data?.id || null;
-          document.getElementById('bonus-modal').classList.remove('hidden');
-          document.getElementById('bonus-modal-title').textContent = data ? 'Sửa Bonus Config' : 'Thêm Bonus Config';
-          
-          document.getElementById('bonus-warehouse').value = data?.warehouse_code || '';
-          document.getElementById('bonus-country').value = data?.country || 'VN';
-          document.getElementById('bonus-type').value = data?.calculation_type || 'per_point';
-          document.getElementById('bonus-amount-per-point').value = data?.amount_per_point || '';
-          document.getElementById('bonus-fixed-amount').value = data?.fixed_amount || '';
-          document.getElementById('bonus-cap').value = data?.cap_amount || '';
-          document.getElementById('bonus-currency').value = data?.currency || 'VND';
-          document.getElementById('bonus-active').checked = data?.is_active !== false;
+      function openBonusModal(data = null) {
+        currentEditId = data?.id || null;
+      document.getElementById('bonus-modal').classList.remove('hidden');
+      document.getElementById('bonus-modal-title').textContent = data ? 'Sửa Bonus Config' : 'Thêm Bonus Config';
+
+      document.getElementById('bonus-warehouse').value = data?.warehouse_code || '';
+      document.getElementById('bonus-country').value = data?.country || 'VN';
+      document.getElementById('bonus-type').value = data?.calculation_type || 'per_point';
+      document.getElementById('bonus-amount-per-point').value = data?.amount_per_point || '';
+      document.getElementById('bonus-fixed-amount').value = data?.fixed_amount || '';
+      document.getElementById('bonus-cap').value = data?.cap_amount || '';
+      document.getElementById('bonus-currency').value = data?.currency || 'VND';
+      document.getElementById('bonus-active').checked = data?.is_active !== false;
         }
 
-        function closeBonusModal() {
-          document.getElementById('bonus-modal').classList.add('hidden');
-          currentEditId = null;
+      function closeBonusModal() {
+        document.getElementById('bonus-modal').classList.add('hidden');
+      currentEditId = null;
         }
 
-        async function saveBonusConfig() {
+      async function saveBonusConfig() {
           const data = {
-            id: currentEditId,
-            warehouse_code: document.getElementById('bonus-warehouse').value || null,
-            country: document.getElementById('bonus-country').value,
-            calculation_type: document.getElementById('bonus-type').value,
-            amount_per_point: document.getElementById('bonus-amount-per-point').value || null,
-            fixed_amount: document.getElementById('bonus-fixed-amount').value || null,
-            cap_amount: document.getElementById('bonus-cap').value || null,
-            currency: document.getElementById('bonus-currency').value,
-            is_active: document.getElementById('bonus-active').checked
+        id: currentEditId,
+      warehouse_code: document.getElementById('bonus-warehouse').value || null,
+      country: document.getElementById('bonus-country').value,
+      calculation_type: document.getElementById('bonus-type').value,
+      amount_per_point: document.getElementById('bonus-amount-per-point').value || null,
+      fixed_amount: document.getElementById('bonus-fixed-amount').value || null,
+      cap_amount: document.getElementById('bonus-cap').value || null,
+      currency: document.getElementById('bonus-currency').value,
+      is_active: document.getElementById('bonus-active').checked
           };
 
-          try {
-            await axios.post(window.API_BASE + '/admin/bonus-config/upsert', data);
-            closeBonusModal();
-            loadBonusConfig();
-            alert('Lưu thành công!');
+      try {
+        await axios.post(window.API_BASE + '/admin/bonus-config/upsert', data);
+      closeBonusModal();
+      loadBonusConfig();
+      alert('Lưu thành công!');
           } catch (error) {
-            alert('Lỗi: ' + (error.response?.data?.error || error.message));
+        alert('Lỗi: ' + (error.response?.data?.error || error.message));
           }
         }
 
-        function editBonusConfig(data) {
-          openBonusModal(data);
+      function editBonusConfig(data) {
+        openBonusModal(data);
         }
+        window.showTab = showTab;
+        window.loadRankingConfig = loadRankingConfig;
+        window.loadRoleConfig = loadRoleConfig;
+        window.loadOrsCatalog = loadOrsCatalog;
+        window.loadBonusConfig = loadBonusConfig;
+        window.runJob = runJob;
+        window.runPipeline = runPipeline;
+        window.loadSeedStats = loadSeedStats;
+        window.loadPreviewData = loadPreviewData;
+        window.resetSeedData = resetSeedData;
+        window.generateSeedData = generateSeedData;
+        window.openRankingModal = openRankingModal;
+        window.closeRankingModal = closeRankingModal;
+        window.saveRankingConfig = saveRankingConfig;
+        window.openRoleModal = openRoleModal;
+        window.closeRoleModal = closeRoleModal;
+        window.saveRoleConfig = saveRoleConfig;
+        window.openOrsModal = openOrsModal;
+        window.closeOrsModal = closeOrsModal;
+        window.saveOrsConfig = saveOrsConfig;
+        window.openBonusModal = openBonusModal;
+        window.closeBonusModal = closeBonusModal;
+        window.saveBonusConfig = saveBonusConfig;
+        window.toggleRankingConfig = toggleRankingConfig;
+        window.toggleRoleConfig = toggleRoleConfig;
+        window.toggleOrsConfig = toggleOrsConfig;
+        window.toggleBonusConfig = toggleBonusConfig;
+        window.deleteRankingConfig = deleteRankingConfig;
+        window.deleteRoleConfig = deleteRoleConfig;
+        window.deleteOrsConfig = deleteOrsConfig;
+        window.deleteBonusConfig = deleteBonusConfig;
+        window.editRankingConfig = editRankingConfig;
+        window.editRoleConfig = editRoleConfig;
+        window.editOrsConfig = editOrsConfig;
+        window.editBonusConfig = editBonusConfig;
       `}} />
 
       {/* ========== MODALS ========== */}
@@ -1282,6 +1492,70 @@ export const AdminPage: FC = () => {
           <div class="flex justify-end gap-3 p-4 border-t">
             <button onclick="closeOrsModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800">Hủy</button>
             <button onclick="saveOrsConfig()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Lưu</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Recovery Config Modal */}
+      <div id="recovery-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4">
+          <div class="flex items-center justify-between p-4 border-b">
+            <h3 id="recovery-modal-title" class="text-lg font-semibold text-gray-900">Thêm Recovery Package</h3>
+            <button onclick="closeRecoveryModal()" class="text-gray-400 hover:text-gray-600">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="p-6 space-y-4">
+            <input type="hidden" id="recovery-id" />
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Code *</label>
+                <input type="text" id="recovery-code" placeholder="VD: REC-001" class="w-full border border-gray-300 rounded-lg px-3 py-2" required />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Loại *</label>
+                <select id="recovery-type" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                  <option value="QUIZ">Quiz - Trắc nghiệm</option>
+                  <option value="TASK">Task - Nhiệm vụ</option>
+                  <option value="TRAINING">Training - Đào tạo</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Tiêu đề *</label>
+              <input type="text" id="recovery-title" placeholder="VD: Quy trình đóng gói chuẩn" class="w-full border border-gray-300 rounded-lg px-3 py-2" required />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Mô tả</label>
+              <textarea id="recovery-desc" rows="2" placeholder="Mô tả chi tiết..." class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Độ khó *</label>
+                <select id="recovery-difficulty" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                  <option value="EASY">Dễ (+1-3đ)</option>
+                  <option value="MEDIUM">Trung bình (+4-6đ)</option>
+                  <option value="HARD">Khó (+7-10đ)</option>
+                  <option value="VERY_HARD">Rất khó (&gt;10đ)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Điểm hồi phục *</label>
+                <input type="number" id="recovery-reward" value="3" min="1" max="50" class="w-full border border-gray-300 rounded-lg px-3 py-2" required />
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Target Roles (phân cách dấu phẩy)</label>
+              <input type="text" id="recovery-roles" placeholder="VD: packer, picker (để trống = all)" class="w-full border border-gray-300 rounded-lg px-3 py-2" />
+            </div>
+            <div class="flex items-center">
+              <input type="checkbox" id="recovery-active" checked class="w-4 h-4 text-blue-600 border-gray-300 rounded" />
+              <label for="recovery-active" class="ml-2 text-sm text-gray-700">Active</label>
+            </div>
+          </div>
+          <div class="flex justify-end gap-3 p-4 border-t">
+            <button onclick="closeRecoveryModal()" class="px-4 py-2 text-gray-600 hover:text-gray-800">Hủy</button>
+            <button onclick="saveRecoveryConfig()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Lưu</button>
           </div>
         </div>
       </div>

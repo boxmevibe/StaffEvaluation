@@ -4,7 +4,7 @@ import { MobileMenu } from './MobileMenu'
 
 interface LayoutProps extends PropsWithChildren {
   title?: string
-  activeTab?: 'employee' | 'manager' | 'admin' | 'payroll'
+  activeTab?: 'employee' | 'leaderboard' | 'recovery' | 'faults' | 'report' | 'payroll' | 'admin'
   warehouseCode?: string
   staffId?: string
   staffName?: string
@@ -38,48 +38,80 @@ export const Layout: FC<LayoutProps> = ({
             </div>
 
             {/* Navigation */}
-            <nav class="hidden md:flex space-x-1">
+            <nav class="hidden md:flex items-center gap-1">
               <a
                 href="/employee"
-                class={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'employee'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-600 hover:bg-gray-100'
+                class={`px-2.5 py-2 rounded-md text-[13px] font-semibold transition-colors flex items-center ${activeTab === 'employee'
+                  ? 'bg-blue-50 text-blue-700'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
               >
-                <i class="fas fa-user mr-2"></i>
+                <i class="fas fa-user w-4 mr-1.5 text-center"></i>
                 Nhân viên
               </a>
               <a
-                href="/manager"
-                class={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'manager'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-600 hover:bg-gray-100'
+                href="/leaderboard"
+                class={`px-2.5 py-2 rounded-md text-[13px] font-semibold transition-colors flex items-center ${activeTab === 'leaderboard'
+                  ? 'bg-blue-50 text-blue-700'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
               >
-                <i class="fas fa-users-cog mr-2"></i>
-                Quản lý
+                <i class="fas fa-chart-line w-4 mr-1.5 text-center"></i>
+                Xếp hạng
               </a>
               <a
-                href="/admin"
-                class={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'admin'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-600 hover:bg-gray-100'
+                href="/recovery"
+                class={`px-2.5 py-2 rounded-md text-[13px] font-semibold transition-colors flex items-center ${activeTab === 'recovery'
+                  ? 'bg-blue-50 text-blue-700'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
               >
-                <i class="fas fa-cogs mr-2"></i>
-                Admin
+                <i class="fas fa-heartbeat w-4 mr-1.5 text-center"></i>
+                Phục hồi
+              </a>
+              <a
+                href="/faults"
+                class={`px-2.5 py-2 rounded-md text-[13px] font-semibold transition-colors flex items-center ${activeTab === 'faults'
+                  ? 'bg-blue-50 text-blue-700'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  }`}
+              >
+                <i class="fas fa-exclamation-triangle w-4 mr-1.5 text-center"></i>
+                Vi phạm
+              </a>
+              <a
+                href="/report"
+                class={`px-2.5 py-2 rounded-md text-[13px] font-semibold transition-colors flex items-center ${activeTab === 'report'
+                  ? 'bg-blue-50 text-blue-700'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  }`}
+              >
+                <i class="fas fa-file-invoice w-4 mr-1.5 text-center"></i>
+                Báo cáo
               </a>
               <a
                 href="/payroll"
-                class={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'payroll'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-600 hover:bg-gray-100'
+                class={`px-2.5 py-2 rounded-md text-[13px] font-semibold transition-colors flex items-center ${activeTab === 'payroll'
+                  ? 'bg-blue-50 text-blue-700'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
               >
-                <i class="fas fa-money-check-alt mr-2"></i>
-                Payroll
+                <i class="fas fa-money-check-alt w-4 mr-1.5 text-center"></i>
+                Lương
+              </a>
+              <a
+                href="/admin"
+                class={`px-2.5 py-2 rounded-md text-[13px] font-semibold transition-colors flex items-center ${activeTab === 'admin'
+                  ? 'bg-blue-50 text-blue-700'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  }`}
+              >
+                <i class="fas fa-cogs w-4 mr-1.5 text-center"></i>
+                Cấu hình
               </a>
             </nav>
+
+
 
             {/* Mode Toggle & User Info */}
             <div class="flex items-center space-x-4">
@@ -104,7 +136,7 @@ export const Layout: FC<LayoutProps> = ({
               </div>
 
               {warehouseCode && (
-                <span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">
+                <span class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600 hidden md:inline-flex">
                   <i class="fas fa-building mr-1"></i>
                   {warehouseCode}
                 </span>
@@ -119,6 +151,8 @@ export const Layout: FC<LayoutProps> = ({
           </div>
         </div>
       </header>
+
+
 
       {/* Page Title */}
       {title && (
@@ -200,6 +234,8 @@ export const Layout: FC<LayoutProps> = ({
         // Initialize mode UI on page load
         document.addEventListener('DOMContentLoaded', updateModeUI);
         updateModeUI();
+
+
       `}} />
     </div>
   )

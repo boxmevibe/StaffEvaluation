@@ -300,7 +300,17 @@ export async function runJobD(
       }
 
       // Apply ORS penalty
-      const kpiBonusFinal = kpiBonusCalculated * (1 - orsPenaltyRate)
+      // Update: Per user request, ORS penalty should NOT be deducted from salary (KPI Bonus).
+      // It should only be tracked for other evaluations.
+      const kpiBonusFinal = kpiBonusCalculated
+
+      // Calculate Quality Bonus (Bonus chuyên cần/chất lượng)
+      // Mindset: Low ORS (< 10) -> Get Bonus. High ORS -> Lose Bonus.
+      let qualityBonus = 0
+      const QUALITY_BONUS_AMOUNT = 500000 // 500k VND default
+      if (orsPointsTotal < 10) {
+        qualityBonus = QUALITY_BONUS_AMOUNT
+      }
 
       // Get payroll data
       const payroll = payrollMap.get(data.staff_id)
@@ -335,7 +345,8 @@ export async function runJobD(
         major_kpi: Math.round(data.majorKpi * 100) / 100,
         rating_factor: ratingFactor,
         kpi_bonus: Math.round(kpiBonusFinal),
-        penalty: orsPointsTotal > 0 ? Math.round(kpiBonusCalculated - kpiBonusFinal) : 0,
+        kpi_allowance: qualityBonus, // Use this field for Quality Bonus
+        penalty: 0, // No monetary penalty deduction
         calculation_version: 'v2.0',
         calculated_at: new Date().toISOString(),
         applied_to_payroll: false,

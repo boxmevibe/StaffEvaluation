@@ -67,9 +67,7 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
                 value={staffId || ''}
                 placeholder="Ví dụ: EMP020"
                 class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-              <p class="text-xs text-gray-400 mt-1">Mã giống bảng lương/chấm công</p>
-              <p id="error-staffId" class="text-xs text-red-500 mt-1 hidden">Vui lòng nhập mã nhân viên.</p>
+              /><p id="error-staffId" class="text-xs text-red-500 mt-1 hidden">Vui lòng nhập mã nhân viên.</p>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Tuần KPI *</label>
@@ -78,9 +76,7 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
                 id="yearWeek"
                 name="yearWeek"
                 class="w-full border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-              <p class="text-xs text-gray-400 mt-1">Chọn tuần bạn muốn xem</p>
-              <p id="error-yearWeek" class="text-xs text-red-500 mt-1 hidden">Vui lòng chọn tuần.</p>
+              /><p id="error-yearWeek" class="text-xs text-red-500 mt-1 hidden">Vui lòng chọn tuần.</p>
             </div>
             <div class="flex items-end">
               <Button type="submit" id="btn-search" className="w-full bg-blue-600 hover:bg-blue-700 min-h-[44px]">
@@ -232,6 +228,52 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
             </CardContent>
           </Card>
         </div>
+
+        {/* ORS Recovery Section */}
+        <Card className="mb-4">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base md:text-lg flex items-center gap-2">
+              <i class="fas fa-sync-alt text-green-600"></i>
+              ORS Recovery
+              <span class="inline-flex items-center justify-center w-4 h-4 text-gray-400 hover:text-blue-500 cursor-help" data-tooltip-key="recovery">
+                <i class="fas fa-info-circle text-xs"></i>
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {/* Recovery Stats */}
+            <div class="grid grid-cols-3 gap-2 mb-4">
+              <div class="text-center p-3 bg-blue-50 rounded-lg">
+                <p class="text-xl font-bold text-blue-600" id="my-recovery-active">0</p>
+                <p class="text-xs text-gray-600">Đang thực hiện</p>
+              </div>
+              <div class="text-center p-3 bg-green-50 rounded-lg">
+                <p class="text-xl font-bold text-green-600" id="my-recovery-completed">0</p>
+                <p class="text-xs text-gray-600">Đã hoàn thành</p>
+              </div>
+              <div class="text-center p-3 bg-purple-50 rounded-lg">
+                <p class="text-xl font-bold text-purple-600" id="my-recovery-points">0</p>
+                <p class="text-xs text-gray-600">Điểm khôi phục</p>
+              </div>
+            </div>
+
+            {/* Active Recovery Tickets */}
+            <div id="my-active-recovery" class="space-y-2">
+              <p class="text-gray-500 text-center py-3 text-sm">Bạn chưa có Recovery Ticket nào đang thực hiện.</p>
+            </div>
+
+            {/* Collapsed Completed History */}
+            <details class="mt-3">
+              <summary class="text-sm text-blue-600 cursor-pointer hover:text-blue-800 font-medium">
+                <i class="fas fa-history mr-1"></i>
+                Xem lịch sử Recovery đã hoàn thành
+              </summary>
+              <div id="my-completed-recovery" class="space-y-2 mt-2 max-h-40 overflow-y-auto">
+                <p class="text-gray-500 text-center py-2 text-xs">Chưa có lịch sử.</p>
+              </div>
+            </details>
+          </CardContent>
+        </Card>
 
         {/* Monthly Summary */}
         <Card className="mb-4">
@@ -483,10 +525,58 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
             const history = historyRes.data.data || [];
             updateRankingChart(history.reverse());
 
+            // Load Recovery data
+            try {
+              const recoveryRes = await axios.get(\`\${window.API_BASE}/recovery/tickets/my/\${staffId}?\${params}\`);
+              const recovery = recoveryRes.data.data;
+              if (recovery) {
+                document.getElementById('my-recovery-active').textContent = recovery.summary.totalActive || 0;
+                document.getElementById('my-recovery-completed').textContent = recovery.summary.totalCompleted || 0;
+                document.getElementById('my-recovery-points').textContent = recovery.summary.totalRecoveryApplied || 0;
+                
+                // Render active tickets
+                if (recovery.active && recovery.active.length > 0) {
+                  document.getElementById('my-active-recovery').innerHTML = recovery.active.map(t => {
+                    const statusLabels = {
+                      ASSIGNED: 'Đã gán',
+                      IN_PROGRESS: 'Đang thực hiện'
+                    };
+                    return \`
+                      <div class="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                        <div class="flex justify-between items-start">
+                          <div>
+                            <p class="font-medium text-gray-900">\${t.ors_recovery_catalog?.title || t.recovery_code}</p>
+                            <p class="text-xs text-gray-500">\${statusLabels[t.status]} • Deadline: \${t.deadline_at || 'Không có'}</p>
+                          </div>
+                          <span class="font-bold text-green-600">+\${t.ors_reward} pts</span>
+                        </div>
+                      </div>
+                    \`;
+                  }).join('');
+                } else {
+                  document.getElementById('my-active-recovery').innerHTML = '<p class="text-gray-500 text-center py-3 text-sm">Bạn chưa có Recovery Ticket nào đang thực hiện.</p>';
+                }
+                
+                // Render completed history
+                if (recovery.completed && recovery.completed.length > 0) {
+                  document.getElementById('my-completed-recovery').innerHTML = recovery.completed.map(t => \`
+                    <div class="p-2 bg-green-50 rounded border border-green-100 text-sm">
+                      <div class="flex justify-between items-center">
+                        <span class="text-gray-700">\${t.ors_recovery_catalog?.title || t.recovery_code}</span>
+                        <span class="font-bold text-green-600">\${t.ors_applied ? '✓ Đã áp dụng' : 'Chờ áp dụng'}</span>
+                      </div>
+                    </div>
+                  \`).join('');
+                }
+              }
+            } catch (recErr) {
+              console.log('Recovery data not available:', recErr.message);
+            }
+
           } catch (error) {
             console.error('Error loading data:', error);
             const errorEl = document.getElementById('error-general');
-            errorEl.textContent = 'Kh\u00f4ng t\u1ea3i \u0111\u01b0\u1ee3c d\u1eef li\u1ec7u KPI. Vui l\u00f2ng ki\u1ec3m tra m\u1ea1ng ho\u1eb7c th\u1eed l\u1ea1i sau.';
+            errorEl.textContent = 'Không tải được dữ liệu KPI. Vui lòng kiểm tra mạng hoặc thử lại sau.';
             errorEl.classList.remove('hidden');
           }
         }
@@ -571,8 +661,21 @@ export const EmployeePage: FC<EmployeePageProps> = ({ staffId, warehouseCode }) 
         const year = now.getFullYear();
         const onejan = new Date(year, 0, 1);
         const week = Math.ceil((((now - onejan) / 86400000) + onejan.getDay() + 1) / 7);
-        document.getElementById('yearWeek').value = year + '-W' + String(week).padStart(2, '0');
+        const currentYearWeek = year + '-W' + String(week).padStart(2, '0');
+        document.getElementById('yearWeek').value = currentYearWeek;
         
+        // Auto-load if params exist (e.g. from global search)
+        const urlParams = new URLSearchParams(window.location.search);
+        const paramStaffId = urlParams.get('staffId');
+        const paramWarehouse = urlParams.get('warehouseCode');
+        
+        if (paramStaffId && paramWarehouse) {
+            document.getElementById('staffId').value = paramStaffId;
+            document.getElementById('warehouseCode').value = paramWarehouse;
+            // Trigger load
+            loadEmployeeData(paramStaffId, paramWarehouse, currentYearWeek);
+        }
+
         // Tooltip Script
         ${tooltipScript}
       `}} />

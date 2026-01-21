@@ -15,12 +15,12 @@ export const MobileMenu = () => {
             <div
                 id="mobile-menu-content"
                 className={cn(
-                    "fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
-                    "inset-y-0 right-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
+                    "fixed z-50 gap-4 bg-white p-6 shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+                    "inset-y-0 left-0 h-full w-3/4 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
                     "hidden" // Start hidden, JS will toggle flex/block and data-state
                 )}
             >
-                <div className="flex flex-col space-y-2 text-center sm:text-left">
+                <div className="flex flex-col space-y-2 text-left">
                     <div className="flex flex-col space-y-2 mt-4">
                         <h2 className="text-lg font-semibold text-foreground">Menu</h2>
                         <p className="text-sm text-muted-foreground">Truy cập nhanh các chức năng</p>
@@ -34,14 +34,23 @@ export const MobileMenu = () => {
                     <Button variant="ghost" className="justify-start" href="/employee">
                         <i className="fa-solid fa-user mr-2"></i> Nhân viên
                     </Button>
-                    <Button variant="ghost" className="justify-start" href="/manager">
-                        <i className="fa-solid fa-users-gear mr-2"></i> Quản lý
+                    <Button variant="ghost" className="justify-start" href="/leaderboard">
+                        <i className="fa-solid fa-chart-line mr-2"></i> Bảng xếp hạng
                     </Button>
-                    <Button variant="ghost" className="justify-start" href="/admin">
-                        <i className="fa-solid fa-screwdriver-wrench mr-2"></i> Admin
+                    <Button variant="ghost" className="justify-start" href="/recovery">
+                        <i className="fa-solid fa-heartbeat mr-2"></i> Phục hồi điểm
+                    </Button>
+                    <Button variant="ghost" className="justify-start" href="/faults">
+                        <i className="fa-solid fa-exclamation-triangle mr-2"></i> Biên bản phạt
+                    </Button>
+                    <Button variant="ghost" className="justify-start" href="/report">
+                        <i className="fa-solid fa-file-invoice mr-2"></i> Báo cáo kho
                     </Button>
                     <Button variant="ghost" className="justify-start" href="/payroll">
-                        <i className="fa-solid fa-money-bill mr-2"></i> Payroll
+                        <i className="fa-solid fa-money-bill mr-2"></i> Bảng lương
+                    </Button>
+                    <Button variant="ghost" className="justify-start" href="/admin">
+                        <i className="fa-solid fa-screwdriver-wrench mr-2"></i> Cấu hình
                     </Button>
                 </div>
 

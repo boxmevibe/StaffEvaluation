@@ -121,3 +121,85 @@ export async function runPipeline(
 
   return result
 }
+
+/**
+ * Run the pipeline for an entire month
+ * Iterates through all weeks in the payroll period
+ */
+import { getWeeksInPeriod } from '../lib/utils'
+
+export async function runMonthlyPipeline(
+  supabase: SupabaseClient<Database>,
+  options: {
+    payrollPeriod: string
+    warehouseCode?: string
+  }
+): Promise<PipelineResult> {
+  const startTime = Date.now()
+  const allErrors: string[] = []
+  let totalProcessed = 0
+
+  const weeks = getWeeksInPeriod(options.payrollPeriod)
+  console.log(`[Monthly Pipeline] Starting for period ${options.payrollPeriod} (Weeks: ${weeks.join(', ')})`)
+
+  const result: PipelineResult = {
+    success: true,
+    jobResults: { jobA: null, jobB: null, jobC: null, jobD: null }, // Only stores last run or aggregate
+    totalProcessed: 0,
+    errors: [],
+    duration: 0
+  }
+
+  try {
+    // 1. Run Job A & B for each week
+    for (const week of weeks) {
+      console.log(`[Monthly Pipeline] Processing Week ${week}...`)
+
+      const resA = await runJobA(supabase, {
+        yearWeek: week,
+        warehouseCode: options.warehouseCode
+      })
+      totalProcessed += resA.processed
+      allErrors.push(...resA.errors)
+
+      const resB = await runJobB(supabase, {
+        yearWeek: week,
+        warehouseCode: options.warehouseCode
+      })
+      totalProcessed += resB.processed
+      allErrors.push(...resB.errors)
+    }
+
+    // 2. Run Job C (ORS Summary) - Monthly
+    console.log(`[Monthly Pipeline] Processing Job C (Monthly)...`)
+    const resC = await runJobC(supabase, {
+      payrollPeriod: options.payrollPeriod,
+      warehouseCode: options.warehouseCode
+    })
+    totalProcessed += resC.processed
+    allErrors.push(...resC.errors)
+    result.jobResults.jobC = resC
+
+    // 3. Run Job D (Payroll Bridge) - Monthly
+    console.log(`[Monthly Pipeline] Processing Job D (Monthly)...`)
+    const resD = await runJobD(supabase, {
+      payrollPeriod: options.payrollPeriod,
+      warehouseCode: options.warehouseCode
+    })
+    totalProcessed += resD.processed
+    allErrors.push(...resD.errors)
+    result.jobResults.jobD = resD
+
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    allErrors.push(`Monthly Pipeline error: ${errorMessage}`)
+    console.error('[Monthly Pipeline] Fatal error:', error)
+  }
+
+  result.duration = Date.now() - startTime
+  result.totalProcessed = totalProcessed
+  result.errors = allErrors
+  result.success = allErrors.length === 0
+
+  return result
+}

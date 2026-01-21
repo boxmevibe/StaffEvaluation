@@ -85,6 +85,18 @@ export interface Database {
         Insert: Omit<PayrollKpiBridge, 'id' | 'created_at' | 'updated_at'>
         Update: Partial<PayrollKpiBridge>
       }
+
+      // ==================== ORS RECOVERY TABLES ====================
+      ors_recovery_catalog: {
+        Row: OrsRecoveryCatalog
+        Insert: Omit<OrsRecoveryCatalog, 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<OrsRecoveryCatalog>
+      }
+      ors_recovery_ticket: {
+        Row: OrsRecoveryTicket
+        Insert: Omit<OrsRecoveryTicket, 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<OrsRecoveryTicket>
+      }
     }
   }
 }
@@ -515,3 +527,106 @@ export const DEFAULT_ORS_MILESTONES = [
   { points_from: 30, points_to: 39, level: 'RED' as MilestoneLevel, penalty_rate: 0.30 },
   { points_from: 40, points_to: 999999, level: 'CRITICAL' as MilestoneLevel, penalty_rate: 1.00 },
 ]
+
+// ==================== ORS RECOVERY TYPES ====================
+
+export type RecoveryType = 'TRAINING_QUIZ' | 'SKILL_CHALLENGE' | 'IMPROVEMENT_PROPOSAL'
+export type RecoveryDifficulty = 'EASY' | 'MEDIUM' | 'HARD' | 'VERY_HARD'
+export type RecoveryTicketStatus = 'ASSIGNED' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED' | 'EXPIRED' | 'CANCELLED'
+
+export interface OrsRecoveryCatalog {
+  id: number
+  recovery_code: string
+  title: string
+  recovery_type: RecoveryType
+  target_roles: string[]
+  difficulty: RecoveryDifficulty
+  ors_reward: number
+  prerequisite: string | null
+  description: string | null
+  validation_method: 'MANAGER_CONFIRM' | 'HR_REVIEW'
+  one_time_use: boolean
+  related_ors_codes: string[]
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface OrsRecoveryTicket {
+  id: number
+  ticket_code: string
+  warehouse_code: string
+  staff_id: string
+  staff_name: string | null
+  recovery_catalog_id: number
+  recovery_code: string
+  recovery_type: RecoveryType
+  ors_reward: number
+  status: RecoveryTicketStatus
+  assigned_at: string
+  deadline_at: string | null
+  completed_at: string | null
+  completion_notes: string | null
+  evidence_description: string | null
+  ors_applied: boolean
+  ors_applied_at: string | null
+  ors_applied_to_period: string | null
+  assigned_by: string
+  confirmed_by: string | null
+  confirmed_at: string | null
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+// Recovery difficulty to reward mapping
+export const RECOVERY_DIFFICULTY_REWARD: Record<RecoveryDifficulty, { min: number; max: number }> = {
+  'EASY': { min: 1, max: 2 },
+  'MEDIUM': { min: 3, max: 4 },
+  'HARD': { min: 5, max: 6 },
+  'VERY_HARD': { min: 7, max: 10 }
+}
+
+// Recovery type labels (Vietnamese)
+export const RECOVERY_TYPE_LABELS: Record<RecoveryType, string> = {
+  'TRAINING_QUIZ': 'Đào tạo & Trắc nghiệm',
+  'SKILL_CHALLENGE': 'Thử thách Kỹ năng',
+  'IMPROVEMENT_PROPOSAL': 'Đề xuất Cải tiến'
+}
+
+// Recovery status labels (Vietnamese)
+export const RECOVERY_STATUS_LABELS: Record<RecoveryTicketStatus, string> = {
+  'ASSIGNED': 'Đã gán',
+  'IN_PROGRESS': 'Đang thực hiện',
+  'COMPLETED': 'Hoàn thành',
+  'FAILED': 'Không đạt',
+  'EXPIRED': 'Hết hạn',
+  'CANCELLED': 'Đã hủy'
+}
+
+// Recovery status colors for UI
+export const RECOVERY_STATUS_COLORS: Record<RecoveryTicketStatus, string> = {
+  'ASSIGNED': '#3B82F6',     // Blue
+  'IN_PROGRESS': '#F59E0B',  // Amber
+  'COMPLETED': '#10B981',    // Green
+  'FAILED': '#EF4444',       // Red
+  'EXPIRED': '#6B7280',      // Gray
+  'CANCELLED': '#9CA3AF'     // Light gray
+}
+
+// Recovery difficulty labels (Vietnamese)
+export const RECOVERY_DIFFICULTY_LABELS: Record<RecoveryDifficulty, string> = {
+  'EASY': 'Dễ',
+  'MEDIUM': 'Trung bình',
+  'HARD': 'Khó',
+  'VERY_HARD': 'Rất khó'
+}
+
+// Recovery difficulty colors for UI
+export const RECOVERY_DIFFICULTY_COLORS: Record<RecoveryDifficulty, string> = {
+  'EASY': '#10B981',      // Green
+  'MEDIUM': '#F59E0B',    // Amber
+  'HARD': '#EF4444',      // Red
+  'VERY_HARD': '#7C3AED'  // Purple
+}
+

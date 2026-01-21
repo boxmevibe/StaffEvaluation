@@ -23,11 +23,11 @@ export const HomePage: FC = () => {
           <div class="flex flex-col md:flex-row gap-3 md:gap-4">
             <Button href="/employee" size="lg" className="bg-white text-blue-600 hover:bg-blue-50 border-0 font-bold w-full md:w-auto justify-center text-base py-3">
               <span class="mr-2">👤</span>
-              Xem Điểm Của Tôi
+              Tra Cứu Nhân Viên
             </Button>
-            <Button href="/manager" size="lg" variant="outline" className="text-white border-white hover:bg-white/10 hover:text-white w-full md:w-auto justify-center text-base py-3">
+            <Button href="/manager" size="lg" variant="outline" className="bg-white text-blue-600 hover:bg-blue-50 border-0 font-bold w-full md:w-auto justify-center text-base py-3">
               <span class="mr-2">📊</span>
-              Quản Lý Toàn Team
+              Quản Lý Chung
             </Button>
           </div>
         </div>

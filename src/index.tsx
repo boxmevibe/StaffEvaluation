@@ -5,7 +5,10 @@ import demo from './routes/demo'
 import seed from './routes/seed'
 import { HomePage } from './pages/home'
 import { EmployeePage } from './pages/employee'
-import { ManagerPage } from './pages/manager'
+import { ManagerPage } from './pages/manager' // Acts as Report Page
+import { LeaderboardPage } from './pages/leaderboard'
+import { RecoveryPage } from './pages/recovery'
+import { FaultsPage } from './pages/faults'
 import { AdminPage } from './pages/admin'
 import { PayrollPage } from './pages/payroll'
 import { OnboardingPage } from './pages/onboarding'
@@ -39,7 +42,23 @@ app.get('/employee', (c) => {
 })
 
 app.get('/manager', (c) => {
-  return c.render(<ManagerPage />, { title: 'Dashboard Quản lý - Performance' })
+  return c.redirect('/report')
+})
+
+app.get('/report', (c) => {
+  return c.render(<ManagerPage />, { title: 'Báo cáo kho - Performance' })
+})
+
+app.get('/leaderboard', (c) => {
+  return c.render(<LeaderboardPage />, { title: 'Bảng xếp hạng - Performance' })
+})
+
+app.get('/recovery', (c) => {
+  return c.render(<RecoveryPage />, { title: 'Phục hồi điểm - Performance' })
+})
+
+app.get('/faults', (c) => {
+  return c.render(<FaultsPage />, { title: 'Biên bản phạt - Performance' })
 })
 
 app.get('/admin', (c) => {

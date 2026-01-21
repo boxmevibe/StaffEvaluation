@@ -69,12 +69,12 @@ function generateWeeklyKPI(staffId: string, yearWeek: string, warehouseCode: str
     role: 'Packer',
     warehouse: warehouseCode
   }
-  
-  const mainTask = employee.role === 'Packer' ? 'packing' : 
-                   employee.role === 'Picker' ? 'picking' : 
-                   employee.role === 'Inspector' ? 'inspection' :
-                   employee.role === 'Data Entry' ? 'data_entry' : 'packing'
-  
+
+  const mainTask = employee.role === 'Packer' ? 'packing' :
+    employee.role === 'Picker' ? 'picking' :
+      employee.role === 'Inspector' ? 'inspection' :
+        employee.role === 'Data Entry' ? 'data_entry' : 'packing'
+
   const workHours = randomFloat(32, 48, 1)
   const workDays = randomInt(5, 6)
   const mainTaskPoints = randomFloat(1200, 2200, 0)
@@ -84,7 +84,7 @@ function generateWeeklyKPI(staffId: string, yearWeek: string, warehouseCode: str
   const taskBreakdown: Record<string, { points: number, quantity: number }> = {
     [mainTask]: { points: mainTaskPoints, quantity: randomInt(200, 400) }
   }
-  
+
   // Add some secondary tasks
   const secondaryTasks = ['packing', 'picking', 'handover', 'inspection'].filter(t => t !== mainTask)
   const numSecondary = randomInt(0, 2)
@@ -124,7 +124,7 @@ function generateWeeklyKPI(staffId: string, yearWeek: string, warehouseCode: str
 // Generate ranking data
 function generateRankingData(weeklyData: ReturnType<typeof generateWeeklyKPI>) {
   const score = getRankingScore(weeklyData.pph)
-  
+
   return {
     id: randomInt(1, 10000),
     warehouse_code: weeklyData.warehouse_code,
@@ -157,7 +157,7 @@ function generateORSEvents(staffId: string, warehouseCode: string, count: number
     { code: 'INSP-001', name: 'Bỏ sót lỗi ngoại quan', points: 6 },
     { code: 'DATA-001', name: 'Nhập sai kích thước', points: 6 },
   ]
-  
+
   const events = []
   for (let i = 0; i < count; i++) {
     const ors = orsCodes[randomInt(0, orsCodes.length - 1)]
@@ -191,7 +191,7 @@ function generateORSMonthlySummary(staffId: string, warehouseCode: string, event
   const confirmedEvents = events.filter(e => e.status === 'CONFIRMED')
   const totalPoints = confirmedEvents.reduce((sum, e) => sum + e.ors_points, 0)
   const milestone = getMilestoneLevel(totalPoints)
-  
+
   return {
     id: randomInt(1, 10000),
     warehouse_code: warehouseCode,
@@ -211,21 +211,21 @@ function generateORSMonthlySummary(staffId: string, warehouseCode: string, event
 // Generate monthly KPI summary
 function generateMonthlyKPISummary(staffId: string, warehouseCode: string) {
   const employee = SAMPLE_EMPLOYEES.find(e => e.staff_id === staffId)
-  
+
   // Generate 4 weekly rankings
   const weeklyRankings = []
   let totalMajorKPI = 0
   let totalRankingScore = 0
-  
+
   for (let w = 1; w <= 4; w++) {
     const points = randomFloat(1200, 2200, 0)
     const hours = randomFloat(32, 48, 1)
     const pph = points / hours
     const score = getRankingScore(pph)
-    
+
     totalMajorKPI += points
     totalRankingScore += score
-    
+
     weeklyRankings.push({
       week: `2026-W${w.toString().padStart(2, '0')}`,
       points,
@@ -233,21 +233,21 @@ function generateMonthlyKPISummary(staffId: string, warehouseCode: string) {
       score
     })
   }
-  
+
   const avgRankingScore = totalRankingScore / 4
   const finalRankingScore = Math.round(avgRankingScore)
   const ratingFactor = getRatingFactor(finalRankingScore)
-  
+
   // Generate ORS data
   const orsPoints = randomInt(0, 35)
   const orsMilestone = getMilestoneLevel(orsPoints)
   const orsPenalty = getPenaltyRate(orsMilestone)
-  
+
   // Calculate bonus
   const amountPerPoint = 1000 // VND
   const kpiBonusCalculated = totalMajorKPI * amountPerPoint * ratingFactor
   const kpiBonusFinal = kpiBonusCalculated * (1 - orsPenalty)
-  
+
   return {
     id: randomInt(1, 10000),
     warehouse_code: warehouseCode || employee?.warehouse || 'BMVN_HCM_TP',
@@ -284,17 +284,17 @@ function generateRankingHistory(staffId: string, warehouseCode: string, weeks: n
   const history = []
   const baseYear = 2026
   let weekNum = 3 // Current week
-  
+
   for (let i = 0; i < weeks; i++) {
     const w = weekNum - i
     if (w <= 0) continue
-    
+
     const yearWeek = `${baseYear}-W${w.toString().padStart(2, '0')}`
     const points = randomFloat(1200, 2200, 0)
     const hours = randomFloat(32, 48, 1)
     const pph = points / hours
     const score = getRankingScore(pph)
-    
+
     history.push({
       id: randomInt(1, 10000),
       warehouse_code: warehouseCode || 'BMVN_HCM_TP',
@@ -310,9 +310,34 @@ function generateRankingHistory(staffId: string, warehouseCode: string, weeks: n
       status: 'FINAL'
     })
   }
-  
+
   return history
 }
+
+// Search staff (for autocomplete) -> Mimic real API
+demo.get('/staff/search', (c) => {
+  const warehouseCode = c.req.query('warehouseCode')
+  const query = (c.req.query('q') || '').toLowerCase()
+
+  let results = SAMPLE_EMPLOYEES.filter(e =>
+    e.staff_name.toLowerCase().includes(query) ||
+    e.staff_id.toLowerCase().includes(query)
+  )
+
+  if (warehouseCode) {
+    results = results.filter(e => e.warehouse === warehouseCode)
+  }
+
+  // Map to match real API response structure
+  const mapped = results.map(e => ({
+    staff_id: e.staff_id,
+    staff_name: e.staff_name,
+    role_name: e.role,
+    warehouse_code: e.warehouse
+  }))
+
+  return c.json({ success: true, mode: 'demo', data: mapped.slice(0, 20) })
+})
 
 // ==================== DEMO APIs ====================
 
@@ -326,12 +351,12 @@ demo.get('/employee/:staffId/kpi/weekly', (c) => {
   const staffId = c.req.param('staffId')
   const yearWeek = c.req.query('yearWeek') || getCurrentWeek()
   const warehouseCode = c.req.query('warehouseCode') || 'BMVN_HCM_TP'
-  
+
   const current = generateWeeklyKPI(staffId, yearWeek, warehouseCode)
   const ranking = generateRankingData(current)
   const prevWeek = getPreviousWeek(yearWeek)
   const previousData = generateWeeklyKPI(staffId, prevWeek, warehouseCode)
-  
+
   return c.json({
     success: true,
     mode: 'demo',
@@ -355,7 +380,7 @@ demo.get('/employee/:staffId/kpi/weekly', (c) => {
 demo.get('/employee/:staffId/kpi/monthly', (c) => {
   const staffId = c.req.param('staffId')
   const warehouseCode = c.req.query('warehouseCode') || 'BMVN_HCM_TP'
-  
+
   return c.json({
     success: true,
     mode: 'demo',
@@ -367,10 +392,10 @@ demo.get('/employee/:staffId/kpi/monthly', (c) => {
 demo.get('/employee/:staffId/ors', (c) => {
   const staffId = c.req.param('staffId')
   const warehouseCode = c.req.query('warehouseCode') || 'BMVN_HCM_TP'
-  
+
   const events = generateORSEvents(staffId, warehouseCode, randomInt(0, 5))
   const summary = generateORSMonthlySummary(staffId, warehouseCode, events)
-  
+
   return c.json({
     success: true,
     mode: 'demo',
@@ -383,7 +408,7 @@ demo.get('/employee/:staffId/ranking/history', (c) => {
   const staffId = c.req.param('staffId')
   const limit = parseInt(c.req.query('limit') || '12')
   const warehouseCode = c.req.query('warehouseCode') || 'BMVN_HCM_TP'
-  
+
   return c.json({
     success: true,
     mode: 'demo',
@@ -395,11 +420,11 @@ demo.get('/employee/:staffId/ranking/history', (c) => {
 demo.get('/manager/dashboard', (c) => {
   const warehouseCode = c.req.query('warehouseCode') || 'BMVN_HCM_TP'
   const yearWeek = c.req.query('yearWeek') || getCurrentWeek()
-  
+
   const totalStaff = randomInt(40, 60)
   const avgPPH = randomFloat(35, 48, 2)
   const totalPoints = randomInt(80000, 120000)
-  
+
   // Generate realistic ranking distribution
   const rankingDistribution = {
     5: randomInt(5, 10),  // Xuất sắc
@@ -408,7 +433,7 @@ demo.get('/manager/dashboard', (c) => {
     2: randomInt(5, 10),  // Cần cải thiện
     1: randomInt(2, 5)    // Chưa đạt
   }
-  
+
   return c.json({
     success: true,
     mode: 'demo',
@@ -428,11 +453,11 @@ demo.get('/manager/ranking', (c) => {
   const warehouseCode = c.req.query('warehouseCode') || 'BMVN_HCM_TP'
   const yearWeek = c.req.query('yearWeek') || getCurrentWeek()
   const limit = parseInt(c.req.query('limit') || '50')
-  
+
   // Generate team ranking data
   const teamData = []
   const warehouseEmployees = SAMPLE_EMPLOYEES.filter(e => e.warehouse === warehouseCode || !warehouseCode)
-  
+
   for (const emp of warehouseEmployees) {
     const weeklyKPI = generateWeeklyKPI(emp.staff_id, yearWeek, emp.warehouse)
     const ranking = generateRankingData(weeklyKPI)
@@ -445,7 +470,7 @@ demo.get('/manager/ranking', (c) => {
       }
     })
   }
-  
+
   // Add more random employees to fill up
   for (let i = teamData.length; i < Math.min(limit, 30); i++) {
     const fakeId = `EMP${String(i + 1).padStart(3, '0')}`
@@ -460,13 +485,13 @@ demo.get('/manager/ranking', (c) => {
       }
     })
   }
-  
+
   // Sort by ranking score (desc) then PPH (desc)
   teamData.sort((a, b) => {
     if (b.ranking_score !== a.ranking_score) return b.ranking_score - a.ranking_score
     return b.pph - a.pph
   })
-  
+
   return c.json({
     success: true,
     mode: 'demo',
@@ -478,7 +503,7 @@ demo.get('/manager/ranking', (c) => {
 // ORS alerts
 demo.get('/manager/ors/alerts', (c) => {
   const warehouseCode = c.req.query('warehouseCode') || 'BMVN_HCM_TP'
-  
+
   // Generate staff with ORS warnings
   const alerts = []
   for (let i = 0; i < randomInt(3, 8); i++) {
@@ -496,10 +521,10 @@ demo.get('/manager/ors/alerts', (c) => {
       penalty_rate: getPenaltyRate(getMilestoneLevel(points))
     })
   }
-  
+
   // Sort by points desc
   alerts.sort((a, b) => b.ors_points_total - a.ors_points_total)
-  
+
   return c.json({
     success: true,
     mode: 'demo',
@@ -510,14 +535,14 @@ demo.get('/manager/ors/alerts', (c) => {
 // Pending ORS events
 demo.get('/manager/ors/pending', (c) => {
   const warehouseCode = c.req.query('warehouseCode') || 'BMVN_HCM_TP'
-  
+
   const events = []
   for (let i = 0; i < randomInt(5, 15); i++) {
     const staffId = `EMP${String(randomInt(1, 50)).padStart(3, '0')}`
     const newEvents = generateORSEvents(staffId, warehouseCode, 1).filter(e => e.status === 'OPEN')
     events.push(...newEvents)
   }
-  
+
   return c.json({
     success: true,
     mode: 'demo',
@@ -544,7 +569,7 @@ demo.get('/admin/ors-catalog', (c) => {
     { id: 14, ors_code: 'INSP-001', job_group: 'inspection', name: 'Bỏ sót lỗi ngoại quan (QC sai)', description: 'Nhập kho hàng móp méo, hư hỏng, ẩm ướt nhưng không phát hiện', severity_level: 'S3', ors_points: 6, is_active: true },
     { id: 15, ors_code: 'DATA-001', job_group: 'data_entry', name: 'Nhập sai kích thước/trọng lượng', description: 'Nhập liệu sai cân nặng, kích thước (DIM)', severity_level: 'S3', ors_points: 6, is_active: true },
   ]
-  
+
   return c.json({
     success: true,
     mode: 'demo',
@@ -561,7 +586,7 @@ demo.get('/admin/ranking-config', (c) => {
     { id: 4, warehouse_code: null, role: null, main_task: null, pph_min: 20, pph_max: 29.99, ranking_score: 2, min_weekly_hours: 20, is_active: true },
     { id: 5, warehouse_code: null, role: null, main_task: null, pph_min: 0, pph_max: 19.99, ranking_score: 1, min_weekly_hours: 20, is_active: true },
   ]
-  
+
   return c.json({
     success: true,
     mode: 'demo',
@@ -581,7 +606,7 @@ demo.get('/admin/role-task-config', (c) => {
     { id: 7, warehouse_code: null, role: 'Unloader', role_id: null, main_task: 'unloading', is_active: true },
     { id: 8, warehouse_code: null, role: 'Mover', role_id: null, main_task: 'move', is_active: true },
   ]
-  
+
   return c.json({
     success: true,
     mode: 'demo',
@@ -598,7 +623,7 @@ demo.get('/admin/bonus-config', (c) => {
     { id: 4, warehouse_code: null, country: 'ID', ranking_score_min: 1, ranking_score_max: 5, calculation_type: 'PER_POINT', amount_per_point: 500, currency: 'IDR', is_active: true },
     { id: 5, warehouse_code: null, country: 'MY', ranking_score_min: 1, ranking_score_max: 5, calculation_type: 'PER_POINT', amount_per_point: 0.5, currency: 'MYR', is_active: true },
   ]
-  
+
   return c.json({
     success: true,
     mode: 'demo',
@@ -610,12 +635,12 @@ demo.get('/admin/bonus-config', (c) => {
 demo.get('/payroll/bridge', (c) => {
   const warehouseCode = c.req.query('warehouseCode') || 'BMVN_HCM_TP'
   const payrollPeriod = c.req.query('payrollPeriod') || '2026-01'
-  
+
   const bridgeData = []
   for (let i = 0; i < 30; i++) {
     const staffId = i < SAMPLE_EMPLOYEES.length ? SAMPLE_EMPLOYEES[i].staff_id : `EMP${String(i + 1).padStart(3, '0')}`
     const monthly = generateMonthlyKPISummary(staffId, warehouseCode)
-    
+
     bridgeData.push({
       id: randomInt(1, 10000),
       warehouse_code: warehouseCode,
@@ -634,7 +659,7 @@ demo.get('/payroll/bridge', (c) => {
       applied_at: randomInt(0, 1) === 1 ? new Date().toISOString() : null
     })
   }
-  
+
   return c.json({
     success: true,
     mode: 'demo',
@@ -664,4 +689,316 @@ demo.post('/payroll/apply', async (c) => {
   return c.json({ success: true, mode: 'demo', message: 'Payroll applied in demo mode', updated: randomInt(20, 40) })
 })
 
+// ==================== ORS MANAGEMENT CRUD ====================
+
+// List all ORS events with filtering
+demo.get('/manager/ors/list', (c) => {
+  const warehouseCode = c.req.query('warehouseCode') || 'BMVN_HCM_TP'
+  const payrollPeriod = c.req.query('payrollPeriod') || '2026-01'
+  const status = c.req.query('status') // OPEN, CONFIRMED, REJECTED
+  const staffId = c.req.query('staffId')
+  const orsCode = c.req.query('orsCode')
+  const q = c.req.query('q')?.toLowerCase() // search query
+  const limit = parseInt(c.req.query('limit') || '50')
+  const offset = parseInt(c.req.query('offset') || '0')
+
+  const orsCodes = [
+    { code: 'PACK-001', name: 'Đóng gói thiếu vật liệu', points: 3, job_group: 'packing' },
+    { code: 'PACK-002', name: 'Không seal chất lỏng', points: 6, job_group: 'packing' },
+    { code: 'PACK-003', name: 'Sử dụng hộp cũ', points: 2, job_group: 'packing' },
+    { code: 'PACK-004', name: 'Đóng gói sai hàng/thiếu hàng', points: 8, job_group: 'packing' },
+    { code: 'PICK-001', name: 'Lấy sai sản phẩm', points: 5, job_group: 'picking' },
+    { code: 'PICK-002', name: 'Báo thiếu hàng sai', points: 7, job_group: 'picking' },
+    { code: 'HAND-001', name: 'Bàn giao sai hãng VC', points: 6, job_group: 'handover' },
+    { code: 'INSP-001', name: 'Bỏ sót lỗi ngoại quan', points: 6, job_group: 'inspection' },
+    { code: 'DATA-001', name: 'Nhập sai kích thước', points: 6, job_group: 'data_entry' },
+  ]
+
+  // Generate events
+  let events = []
+  const numEvents = randomInt(30, 60)
+
+  for (let i = 0; i < numEvents; i++) {
+    const ors = orsCodes[randomInt(0, orsCodes.length - 1)]
+    const staffNum = randomInt(1, 50)
+    const eventStatus = ['OPEN', 'CONFIRMED', 'CONFIRMED', 'REJECTED'][randomInt(0, 3)] as 'OPEN' | 'CONFIRMED' | 'REJECTED'
+    const dayNum = randomInt(1, 19)
+
+    events.push({
+      id: 1000 + i,
+      warehouse_code: warehouseCode,
+      staff_id: `EMP${String(staffNum).padStart(3, '0')}`,
+      staff_name: `Nhân viên ${staffNum}`,
+      event_date: `2026-01-${dayNum.toString().padStart(2, '0')}`,
+      event_time: `${randomInt(8, 17)}:${randomInt(0, 59).toString().padStart(2, '0')}:00`,
+      ors_code: ors.code,
+      ors_name: ors.name,
+      ors_points: ors.points,
+      job_group: ors.job_group,
+      description: `Vi phạm ${ors.name} tại khu vực kho`,
+      reported_by: 'QC Manager',
+      reviewed_by: eventStatus !== 'OPEN' ? 'Supervisor' : null,
+      reviewed_at: eventStatus !== 'OPEN' ? new Date().toISOString() : null,
+      status: eventStatus,
+      created_at: `2026-01-${dayNum.toString().padStart(2, '0')}T${randomInt(8, 17)}:00:00Z`
+    })
+  }
+
+  // Apply filters
+  if (status) {
+    events = events.filter(e => e.status === status)
+  }
+  if (staffId) {
+    events = events.filter(e => e.staff_id === staffId)
+  }
+  if (orsCode) {
+    events = events.filter(e => e.ors_code === orsCode)
+  }
+  if (q) {
+    events = events.filter(e =>
+      e.staff_name.toLowerCase().includes(q) ||
+      e.staff_id.toLowerCase().includes(q) ||
+      e.ors_code.toLowerCase().includes(q) ||
+      e.description?.toLowerCase().includes(q)
+    )
+  }
+
+  // Sort by date descending
+  events.sort((a, b) => b.event_date.localeCompare(a.event_date))
+
+  const total = events.length
+  const paginatedEvents = events.slice(offset, offset + limit)
+
+  return c.json({
+    success: true,
+    mode: 'demo',
+    data: paginatedEvents,
+    pagination: { limit, offset, total }
+  })
+})
+
+// Update ORS event
+demo.put('/manager/ors/:eventId/update', async (c) => {
+  const eventId = c.req.param('eventId')
+  const body = await c.req.json()
+
+  return c.json({
+    success: true,
+    mode: 'demo',
+    data: {
+      id: parseInt(eventId),
+      ...body,
+      updated_at: new Date().toISOString()
+    }
+  })
+})
+
+// Delete ORS event
+demo.delete('/manager/ors/:eventId/delete', (c) => {
+  const eventId = c.req.param('eventId')
+
+  return c.json({
+    success: true,
+    mode: 'demo',
+    message: `Đã xóa sự cố #${eventId}`
+  })
+})
+
+
+// ORS Recovery Catalog
+demo.get('/admin/recovery-catalog', (c) => {
+  const catalog = [
+    { id: 1, recovery_code: 'REC-001', title: 'Quy trình đóng gói chuẩn', recovery_type: 'TRAINING_QUIZ', target_roles: ['Packer'], difficulty: 'EASY', ors_reward: 2, prerequisite: null, description: 'Ôn tập lại quy trình đóng gói chuẩn để tránh lỗi thiếu vật liệu chèn lót.', validation_method: 'MANAGER_CONFIRM', one_time_use: false, related_ors_codes: ['PACK-001'], is_active: true },
+    { id: 2, recovery_code: 'REC-002', title: 'Thử thách: 100 đơn hàng không lỗi', recovery_type: 'SKILL_CHALLENGE', target_roles: ['Packer', 'Picker'], difficulty: 'MEDIUM', ors_reward: 5, prerequisite: null, description: 'Hoàn thành 100 đơn hàng liên tiếp mà không phát sinh lỗi nào.', validation_method: 'MANAGER_CONFIRM', one_time_use: false, related_ors_codes: ['PACK-001', 'PICK-001'], is_active: true },
+    { id: 3, recovery_code: 'REC-003', title: 'Đề xuất cải tiến quy trình Pick', recovery_type: 'IMPROVEMENT_PROPOSAL', target_roles: ['Picker'], difficulty: 'HARD', ors_reward: 8, prerequisite: null, description: 'Đưa ra ý tưởng khả thi để giảm thiểu lỗi Pick sai hàng.', validation_method: 'HR_REVIEW', one_time_use: true, related_ors_codes: ['PICK-001'], is_active: true },
+    { id: 4, recovery_code: 'REC-004', title: 'Khóa học: Nhận diện lỗi ngoại quan', recovery_type: 'TRAINING_QUIZ', target_roles: ['Inspector', 'Picker'], difficulty: 'MEDIUM', ors_reward: 4, prerequisite: null, description: 'Học cách nhận diện các lỗi ngoại quan phổ biến trên bao bì sản phẩm.', validation_method: 'MANAGER_CONFIRM', one_time_use: false, related_ors_codes: ['INSP-001'], is_active: true },
+    { id: 5, recovery_code: 'REC-005', title: 'Hỗ trợ dọn dẹp kho (5S)', recovery_type: 'VOLUNTEER_WORK', target_roles: ['All'], difficulty: 'EASY', ors_reward: 3, prerequisite: null, description: 'Tham gia dọn dẹp, sắp xếp lại khu vực làm việc theo tiêu chuẩn 5S.', validation_method: 'MANAGER_CONFIRM', one_time_use: false, related_ors_codes: ['PUT-001'], is_active: true },
+    { id: 6, recovery_code: 'REC-006', title: 'Mentoring: Hướng dẫn nhân viên mới', recovery_type: 'MENTORSHIP', target_roles: ['Packer', 'Picker'], difficulty: 'HARD', ors_reward: 10, prerequisite: 'Senior Level', description: 'Hướng dẫn 1 nhân viên mới trong 1 tuần và đảm bảo họ không mắc lỗi.', validation_method: 'HR_REVIEW', one_time_use: false, related_ors_codes: [], is_active: true },
+    { id: 7, recovery_code: 'REC-007', title: 'Quiz: An toàn lao động', recovery_type: 'TRAINING_QUIZ', target_roles: ['All'], difficulty: 'EASY', ors_reward: 2, prerequisite: null, description: 'Hoàn thành bài kiểm tra về quy định an toàn lao động trong kho.', validation_method: 'SYSTEM_AUTO', one_time_use: false, related_ors_codes: [], is_active: true },
+    { id: 8, recovery_code: 'REC-008', title: 'Đóng gói 50 đơn hàng khó', recovery_type: 'SKILL_CHALLENGE', target_roles: ['Packer'], difficulty: 'MEDIUM', ors_reward: 6, prerequisite: null, description: 'Xử lý thành công 50 đơn hàng cồng kềnh hoặc dễ vỡ.', validation_method: 'MANAGER_CONFIRM', one_time_use: false, related_ors_codes: ['PACK-004'], is_active: true },
+  ]
+
+  return c.json({
+    success: true,
+    mode: 'demo',
+    data: catalog
+  })
+})
+
+demo.post('/admin/recovery-catalog', async (c) => {
+  const body = await c.req.json()
+  return c.json({ success: true, mode: 'demo', data: { ...body, id: randomInt(10, 1000) } })
+})
+
+demo.delete('/admin/recovery-catalog/:id', (c) => {
+  return c.json({ success: true, mode: 'demo', message: 'Deleted successfully' })
+})
+
+// Recovery Data endpoints
+demo.get('/recovery/catalog', (c) => {
+  // Sync with admin catalog but simplified for user view
+  const catalog = [
+    { id: 1, recovery_code: 'REC-001', title: 'Quy trình đóng gói chuẩn', recovery_type: 'TRAINING_QUIZ', difficulty: 'EASY', ors_reward: 2, description: 'Ôn tập lại quy trình đóng gói chuẩn để tránh lỗi thiếu vật liệu chèn lót.', ors_recovery_catalog: { title: 'Quy trình đóng gói chuẩn' } },
+    { id: 2, recovery_code: 'REC-002', title: 'Thử thách: 100 đơn hàng không lỗi', recovery_type: 'SKILL_CHALLENGE', difficulty: 'MEDIUM', ors_reward: 5, description: 'Hoàn thành 100 đơn hàng liên tiếp mà không phát sinh lỗi nào.', ors_recovery_catalog: { title: 'Thử thách: 100 đơn hàng không lỗi' } },
+    { id: 3, recovery_code: 'REC-003', title: 'Đề xuất cải tiến quy trình Pick', recovery_type: 'IMPROVEMENT_PROPOSAL', difficulty: 'HARD', ors_reward: 8, description: 'Đưa ra ý tưởng khả thi để giảm thiểu lỗi Pick sai hàng.', ors_recovery_catalog: { title: 'Đề xuất cải tiến quy trình Pick' } },
+    { id: 4, recovery_code: 'REC-004', title: 'Khóa học: Nhận diện lỗi ngoại quan', recovery_type: 'TRAINING_QUIZ', difficulty: 'MEDIUM', ors_reward: 4, description: 'Học cách nhận diện các lỗi ngoại quan phổ biến trên bao bì sản phẩm.', ors_recovery_catalog: { title: 'Khóa học: Nhận diện lỗi ngoại quan' } },
+    { id: 5, recovery_code: 'REC-005', title: 'Hỗ trợ dọn dẹp kho (5S)', recovery_type: 'VOLUNTEER_WORK', difficulty: 'EASY', ors_reward: 3, description: 'Tham gia dọn dẹp, sắp xếp lại khu vực làm việc theo tiêu chuẩn 5S.', ors_recovery_catalog: { title: 'Hỗ trợ dọn dẹp kho (5S)' } },
+  ]
+  return c.json({ success: true, mode: 'demo', data: catalog })
+})
+
+demo.get('/recovery/stats', (c) => {
+  const warehouseCode = c.req.query('warehouseCode')
+  return c.json({
+    success: true,
+    mode: 'demo',
+    data: {
+      byStatus: {
+        ASSIGNED: randomInt(10, 30),
+        IN_PROGRESS: randomInt(15, 40),
+        COMPLETED: randomInt(20, 50),
+        FAILED: randomInt(2, 10)
+      },
+      appliedRecoveryPoints: randomInt(100, 500)
+    }
+  })
+})
+
+demo.get('/recovery/tickets', (c) => {
+  const warehouseCode = c.req.query('warehouseCode')
+  const limit = parseInt(c.req.query('limit') || '50') // Increased default limit
+
+  const tickets = []
+  const count = randomInt(20, 50) // Increased generation count
+
+  const recoveryTypes = ['TRAINING_QUIZ', 'SKILL_CHALLENGE', 'IMPROVEMENT_PROPOSAL', 'VOLUNTEER_WORK', 'MENTORSHIP']
+  const titles = [
+    'Quy trình đóng gói chuẩn', 'Thử thách: 100 đơn hàng không lỗi',
+    'Đề xuất cải tiến quy trình Pick', 'Khóa học: Nhận diện lỗi ngoại quan',
+    'Hỗ trợ dọn dẹp kho (5S)', 'Quiz: An toàn lao động'
+  ]
+
+  for (let i = 0; i < count; i++) {
+    const status = ['ASSIGNED', 'IN_PROGRESS', 'IN_PROGRESS', 'COMPLETED', 'COMPLETED', 'COMPLETED', 'FAILED'][randomInt(0, 6)]
+    const isCompleted = status === 'COMPLETED'
+    const type = recoveryTypes[randomInt(0, recoveryTypes.length - 1)]
+    const title = titles[randomInt(0, titles.length - 1)]
+
+    // Create more realistic date distribution
+    const assignedDate = new Date()
+    assignedDate.setDate(assignedDate.getDate() - randomInt(1, 14))
+
+    let completedDate = null
+    if (isCompleted || status === 'FAILED') {
+      completedDate = new Date(assignedDate)
+      completedDate.setDate(assignedDate.getDate() + randomInt(1, 5))
+    }
+
+    tickets.push({
+      id: randomInt(1, 10000),
+      ticket_code: `TICKET-${randomInt(10000, 99999)}`,
+      warehouse_code: warehouseCode || 'BMVN_HCM_TP',
+      staff_id: `NV${randomInt(1, 20).toString().padStart(3, '0')}`, // Use a subset of staff for density
+      staff_name: `Nhân viên Demo ${randomInt(1, 20)}`,
+      recovery_code: 'REC-00' + randomInt(1, 8),
+      recovery_type: type,
+      ors_reward: randomInt(2, 8),
+      status: status,
+      assigned_at: assignedDate.toISOString(),
+      deadline_at: new Date(assignedDate.getTime() + 86400000 * 7).toISOString(),
+      completed_at: completedDate ? completedDate.toISOString() : null,
+      ors_applied: isCompleted && randomInt(0, 1) === 1,
+      ors_recovery_catalog: {
+        title: title,
+        recovery_type: type
+      }
+    })
+  }
+
+  return c.json({ success: true, mode: 'demo', data: tickets })
+})
+
+demo.post('/recovery/tickets', async (c) => {
+  const body = await c.req.json()
+  return c.json({ success: true, mode: 'demo', data: { ...body, id: randomInt(1, 10000), ticket_code: 'NEW-TICKET', status: 'ASSIGNED', assigned_at: new Date().toISOString() } })
+})
+
+demo.put('/recovery/tickets/:id/status', async (c) => {
+  const body = await c.req.json()
+  return c.json({ success: true, mode: 'demo', data: { id: c.req.param('id'), ...body } })
+})
+
+// Seed generation endpoint
+demo.post('/seed/generate', async (c) => {
+  const { payrollPeriod, weeks } = await c.req.json()
+  // In a real implementation this would actually insert into the database
+  // For demo mode we just simulate a delay and return success
+
+  await new Promise(resolve => setTimeout(resolve, 2000))
+
+  const numWeeks = weeks || 4
+  const multiplier = numWeeks * 4 // approx multiplier for weekly data
+
+  return c.json({
+    success: true,
+    mode: 'demo',
+    message: `Generated simulation data for ${payrollPeriod} (${numWeeks} weeks).`,
+    records: {
+      kpi_weekly: 132 * multiplier,
+      ranking: 132 * multiplier,
+      ors_events: 45 * multiplier,
+      recovery_tickets: randomInt(100, 300) // Increased volume
+    }
+  })
+})
+
+demo.get('/seed/stats', (c) => {
+  return c.json({
+    success: true,
+    mode: 'demo',
+    stats: {
+      kpi_weekly_summary: { count: randomInt(1000, 5000) },
+      ranking_weekly_result: { count: randomInt(1000, 5000) },
+      ors_event: { count: randomInt(200, 800) },
+      ors_monthly_summary: { count: randomInt(100, 500) },
+      kpi_monthly_summary: { count: randomInt(100, 500) },
+      payroll_kpi_bridge: { count: randomInt(100, 500) },
+      ors_recovery_ticket: { count: randomInt(50, 200) }
+    }
+  })
+})
+
+demo.get('/seed/preview', (c) => {
+  const table = c.req.query('table')
+  const data = []
+
+  if (table === 'ors_recovery_ticket') {
+    for (let i = 0; i < 10; i++) {
+      const type = ['TRAINING_QUIZ', 'SKILL_CHALLENGE', 'IMPROVEMENT_PROPOSAL'][randomInt(0, 2)]
+      data.push({
+        id: i + 1,
+        ticket_code: `TCK-${randomInt(10000, 99999)}`,
+        staff_id: `NV${randomInt(1, 20).toString().padStart(3, '0')}`,
+        // staff_name: `Nhân viên Demo ${i + 1}`, // Optional if needed by UI
+        status: ['ASSIGNED', 'IN_PROGRESS', 'COMPLETED', 'FAILED'][randomInt(0, 3)],
+        recovery_type: type,
+        ors_reward: randomInt(2, 10),
+        assigned_at: new Date().toISOString()
+      })
+    }
+  } else {
+    // Return existing generators
+    // Simplified for brevity of this specific edit
+    data.push({ id: 1, info: 'Sample Data' })
+  }
+
+  return c.json({
+    success: true,
+    mode: 'demo',
+    data: data,
+    total: 100
+  })
+})
+
 export default demo
+

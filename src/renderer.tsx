@@ -101,6 +101,10 @@ export const renderer = jsxRenderer(({ children, title }) => {
           .border-input { border-color: hsl(var(--input)); }
         `}</style>
         <script>{`
+          // API Mode Management
+          window.API_MODE = localStorage.getItem('kpi_api_mode') || 'demo';
+          window.API_BASE = window.API_MODE === 'demo' ? '/demo' : '/api';
+
           tailwind.config = {
             theme: {
               extend: {
